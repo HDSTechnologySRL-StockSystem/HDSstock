@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#0D63EA"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <title>HDS v2.9 — Sistema de Stock</title>
+
+  <!-- Fuentes (Google Fonts CDN) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&family=Barlow+Condensed:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <!-- QR library (UMD, expone window.QRCode) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <!-- ════ Estilos globales (orden importa) ════ -->
+  <link rel="stylesheet" href="src/shared/styles/tokens.css"/>
+  <link rel="stylesheet" href="src/shared/styles/layout.css"/>
+  <link rel="stylesheet" href="src/shared/styles/theme.css"/>
+  <link rel="stylesheet" href="src/shared/styles/responsive.css"/>
+
+  <!-- ════ Estilos por módulo ════ -->
+  <link rel="stylesheet" href="src/welcome/welcome.css"/>
+  <link rel="stylesheet" href="src/login/login.css"/>
+  <link rel="stylesheet" href="src/home/home.css"/>
+  <link rel="stylesheet" href="src/mapa_n1/mapa.css"/>
+  <link rel="stylesheet" href="src/movimientos/movimientos.css"/>
+  <link rel="stylesheet" href="src/peticiones/peticiones.css"/>
+  <link rel="stylesheet" href="src/balances/balances.css"/>
+  <link rel="stylesheet" href="src/usuarios/usuarios.css"/>
+  <link rel="stylesheet" href="src/stock/stock.css"/>
+  <link rel="stylesheet" href="src/qr/qr.css"/>
+  <link rel="stylesheet" href="src/search/search.css"/>
+</head>
+<body>
+
+<!-- Fondo de marca (capa fija, detrás de todo) -->
+<div id="brand-bg" aria-hidden="true"></div>
+
+<!-- Toggle claro/oscuro (botón flotante) -->
+<button id="theme-toggle" onclick="toggleTheme()" title="Modo claro / oscuro" aria-label="Cambiar tema">🌙</button>
+
+<!-- Stack de toasts (posición fija, z-index alto) -->
+<div id="toast-stack"></div>
+
+<!-- Modal global: limpiar movimientos -->
+<div id="del-movs-overlay">
+  <div class="del-movs-card">
+    <div class="del-movs-title">🗑 Limpiar movimientos</div>
+    <div class="del-movs-sub">Borrá registros antiguos para liberar espacio. Esta acción no se puede deshacer.</div>
+    <div class="del-movs-opts" id="del-movs-opts"></div>
+    <div class="del-movs-footer">
+      <button class="del-movs-cancel" onclick="closeDeleteMovsModal()">Cancelar</button>
+      <button class="del-movs-confirm" id="del-movs-confirm-btn" onclick="confirmDeleteMovs()">Confirmar borrado</button>
+    </div>
+  </div>
+</div>
+
+<div id="sc-welcome" onclick="dismissWelcome()" role="button" tabindex="0" aria-label="Cerrar pantalla de bienvenida">
+  <div class="wel-card">
+    <img class="wel-img" src="data:image/jpeg;base64,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QEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREH/2Q==" alt="HDS Technology"/>
+  </div>
+  <div class="wel-sub">Sistema de Stock</div>
+  <div class="wel-bar"><i></i></div>
+</div>
+
+<div id="sc-login" class="screen on">
+  <div class="wrap">
+    <div class="login-card-shell">
+      <div class="login-brand">H</div>
+      <div class="login-title" id="login-mode-title">Ingresar</div>
+      <div class="login-hint">Sistema de stock · HDS S.R.L.</div>
+      <div class="login-fields">
+        <div class="login-input-wrap">
+          <input class="login-input" id="li-usr" type="text" placeholder="Usuario" autocomplete="off" maxlength="30"/>
+        </div>
+        <div class="login-input-wrap">
+          <input class="login-input" id="li-pass" type="password" placeholder="Contraseña" maxlength="30"/>
+        </div>
+        <div class="login-input-wrap" id="li-pass2-wrap" style="display:none">
+          <input class="login-input" id="li-pass2" type="password" placeholder="Repetir contraseña" maxlength="30"/>
+        </div>
+        <div class="login-input-wrap" id="li-mail-wrap" style="display:none">
+          <input class="login-input" id="li-mail" type="email" placeholder="Correo electrónico (opcional)" autocomplete="off" maxlength="80"/>
+        </div>
+      </div>
+      <div class="login-err" id="li-err"></div>
+      <button class="login-btn primary" id="li-main-btn" onclick="loginSubmit()">Ingresar</button>
+      <button class="login-btn" id="li-sec-btn" onclick="loginToggleMode()">Crear cuenta</button>
+      <button class="login-link" id="li-forgot-btn" onclick="openForgotPassword()">¿Olvidaste tu contraseña?</button>
+    </div>
+  </div>
+</div>
+
+<div id="reset-overlay" onclick="if(event.target===this)closeResetOverlay()">
+  <div class="reset-card">
+    <div class="login-brand">H</div>
+    <div class="login-title" id="reset-title">Recuperar contraseña</div>
+    <div class="login-hint" id="reset-hint">Ingresá tu usuario y te enviamos un código al mail registrado.</div>
+    <div class="login-fields reset-step" id="reset-step1">
+      <div class="login-input-wrap">
+        <input class="login-input" id="rs-usr" type="text" placeholder="Usuario" autocomplete="off" maxlength="30"/>
+      </div>
+      <div class="login-err" id="rs-err1"></div>
+      <button class="login-btn primary" onclick="resetStep1Submit()">Enviar código</button>
+      <button class="login-btn" onclick="closeResetOverlay()">Cancelar</button>
+    </div>
+    <div class="login-fields reset-step hidden" id="reset-step2">
+      <div class="login-input-wrap">
+        <input class="login-input reset-code-input" id="rs-code" type="text" placeholder="000000" maxlength="6" autocomplete="off"/>
+      </div>
+      <div class="login-err" id="rs-err2"></div>
+      <button class="login-btn primary" onclick="resetStep2Submit()">Verificar código</button>
+      <button class="login-link" onclick="resetStep1Retry()">Reenviar código</button>
+      <button class="login-btn" onclick="closeResetOverlay()">Cancelar</button>
+    </div>
+    <div class="login-fields reset-step hidden" id="reset-step3">
+      <div class="login-input-wrap">
+        <input class="login-input" id="rs-newpass" type="password" placeholder="Nueva contraseña" maxlength="30"/>
+      </div>
+      <div class="login-input-wrap">
+        <input class="login-input" id="rs-newpass2" type="password" placeholder="Repetir contraseña" maxlength="30"/>
+      </div>
+      <div class="login-err" id="rs-err3"></div>
+      <button class="login-btn primary" onclick="resetStep3Submit()">Cambiar contraseña</button>
+      <button class="login-btn" onclick="closeResetOverlay()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+
+
+<div id="sc-home" class="screen">
+  <div class="topbar">
+    <div class="topbar-l">
+      <div><div class="pg-title">HDS</div><div class="pg-sub">Sistema de Stock · <span style="color:var(--accent);font-weight:700">v2.9</span></div></div>
+      <button class="sede-btn" id="sede-btn" onclick="openSedeModal()" title="Cambiar de sede"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg><span id="sede-btn-label">HDS</span></button>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="search-trigger" onclick="openSearch()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Buscar</button>
+      <div class="usr-chip" id="usr-chip-btn" onclick="openMyProfile()" title="Ver mi perfil" role="button" tabindex="0">
+        <div class="usr-chip-id">
+          <span class="usr-chip-name" id="home-usr-label"></span>
+          <span class="usr-chip-meta"><span id="home-rol-label"></span></span>
+        </div>
+        <div class="usr-chip-av" id="home-usr-av"></div>
+      </div>
+      <button class="logout-btn" onclick="logout()">SALIR</button>
+    </div>
+  </div>
+  <div class="wrap">
+    <div>
+      <div class="logo-row"><div class="logo-box">HDS</div><div class="logo-name">HDS</div></div>
+      <div class="logo-sub">Sistema de Stock</div>
+    </div>
+    <div class="divider"></div>
+    <div class="sec-label">Elegí tu nave</div>
+    <div class="naves">
+      <div class="nave-card" onclick="go('n1')">
+        <div class="nave-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><path d="M9 22V12h6v10"/></svg></div>
+        <div class="nave-num">N-1</div><div class="nave-lbl" id="nave-lbl-n1">Nave 1</div>
+      </div>
+      <div class="nave-card" onclick="go('n2')">
+        <div class="nave-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><path d="M9 22V12h6v10"/></svg></div>
+        <div class="nave-num">N-2</div><div class="nave-lbl" id="nave-lbl-n2">Nave 2</div>
+      </div>
+    </div>
+    <div id="home-admin-card" style="display:none;margin-top:22px;width:100%">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;text-align:center">Administración</div>
+      <div style="display:flex;gap:14px;justify-content:center">
+        <div class="nave-card" onclick="goUsers()" style="width:180px;height:120px;flex-direction:row;gap:12px;padding:0 20px">
+          <div class="nave-icon" style="width:36px;height:36px"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+          <div><div class="nave-num" style="font-size:14px">Usuarios</div><div class="nave-lbl">Gestión y permisos</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bottomnav">
+    <button class="nb on"><svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Inicio</button>
+    <button class="nb" onclick="go('mov')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/><line x1="17" y1="7" x2="7" y2="17"/></svg>Movimientos</button>
+    <button class="nb-wrap" onclick="go('pet')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Peticiones<span class="nav-badge" id="nb-badge-home" style="display:none"></span></button>
+    <button class="nb" onclick="go('bal')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Balances</button>
+    <button class="nb nb-users" onclick="goUsers()"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Usuarios<span class="nav-badge nb-users-badge" style="display:none"></span></button>
+  </div>
+</div>
+
+
+<div id="sc-n1" class="screen">
+  <div class="topbar">
+    <div class="topbar-l">
+      <button class="go-btn" onclick="go('home')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Inicio</button>
+      <button class="go-btn" onclick="switchNave()" title="Cambiar de nave"><svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>Cambiar nave</button>
+      <span class="nave-chip"><svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><path d="M9 22V12h6v10"/></svg>N-1</span>
+      <div><div class="pg-title" id="nav-title-n1" onclick="openRenameNave('n1')" title="Clic para renombrar" style="cursor:pointer;user-select:none">Nave 1</div><div class="pg-sub">Plano de planta</div></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="search-trigger" onclick="openSearch()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Buscar<span class="search-kbd">Ctrl+K</span></button>
+    </div>
+  </div>
+  <div class="map-main" style="position:relative">
+    <div class="fab-wrap">
+      <button class="map-fab" id="fab-n1" onclick="toggleFabMenu('n1')" title="Agregar">+</button>
+      <div class="fab-menu" id="fab-menu-n1">
+        <button class="fm-estante" onclick="fabAction('estante')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18"/></svg>Nuevo estante</button>
+        <button class="fm-prod" onclick="fabAction('producto')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nuevo producto</button>
+        <button class="fm-sumar" onclick="fabAction('sumar')"><svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>Sumar stock</button>
+      </div>
+    </div>
+    <div class="map-canvas">
+      <svg viewBox="0 0 818 501" preserveAspectRatio="xMidYMid meet" style="max-width:100%;max-height:100%;width:auto;height:auto" xmlns="http://www.w3.org/2000/svg">
+        <text x="409" y="28" font-family="'Barlow Condensed',monospace" font-size="20" font-weight="700" fill="rgba(11,28,63,.32)" text-anchor="middle" letter-spacing="5">NAVE 1</text>
+        <g class="cell" data-id="U" data-nave="n1" onclick="cellClick(this)"><rect x="140" y="65" width="91" height="51" rx="3"/><text x="185" y="91" font-size="20">U</text></g>
+        <g class="cell" data-id="R" data-nave="n1" onclick="cellClick(this)"><rect x="236" y="65" width="19" height="51" rx="2"/><text x="245" y="91" font-size="11">R</text></g>
+        <g class="cell" data-id="O" data-nave="n1" onclick="cellClick(this)"><rect x="258" y="65" width="19" height="51" rx="2"/><text x="267" y="91" font-size="11">O</text></g>
+        <g class="cell" data-id="V" data-nave="n1" onclick="cellClick(this)"><rect x="281" y="65" width="45" height="51" rx="3"/><text x="303" y="91" font-size="16">V</text></g>
+        <g class="cell" data-id="S" data-nave="n1" onclick="cellClick(this)"><rect x="236" y="117" width="19" height="46" rx="2"/><text x="245" y="140" font-size="11">S</text></g>
+        <g class="cell" data-id="P" data-nave="n1" onclick="cellClick(this)"><rect x="258" y="117" width="19" height="46" rx="2"/><text x="267" y="140" font-size="11">P</text></g>
+        <g class="cell" data-id="T" data-nave="n1" onclick="cellClick(this)"><rect x="236" y="164" width="19" height="47" rx="2"/><text x="245" y="188" font-size="11">T</text></g>
+        <g class="cell" data-id="Q" data-nave="n1" onclick="cellClick(this)"><rect x="258" y="164" width="19" height="47" rx="2"/><text x="267" y="188" font-size="11">Q</text></g>
+        <g class="cell" data-id="X1" data-nave="n1" onclick="cellClick(this)"><rect x="389" y="65" width="21" height="27" rx="2"/><text x="399" y="79" font-size="9">X1</text></g>
+        <g class="cell" data-id="X2" data-nave="n1" onclick="cellClick(this)"><rect x="413" y="65" width="22" height="27" rx="2"/><text x="424" y="79" font-size="9">X2</text></g>
+        <g class="cell" data-id="F" data-nave="n1" onclick="cellClick(this)"><rect x="491" y="65" width="44" height="27" rx="2"/><text x="513" y="79" font-size="13">F</text></g>
+        <g class="cell" data-id="E" data-nave="n1" onclick="cellClick(this)"><rect x="491" y="93" width="44" height="47" rx="2"/><text x="513" y="117" font-size="14">E</text></g>
+        <g class="cell" data-id="A" data-nave="n1" onclick="cellClick(this)"><rect x="347" y="143" width="47" height="22" rx="2"/><text x="370" y="154" font-size="13">A</text></g>
+        <g class="cell" data-id="B" data-nave="n1" onclick="cellClick(this)"><rect x="395" y="143" width="46" height="22" rx="2"/><text x="418" y="154" font-size="13">B</text></g>
+        <g class="cell" data-id="C" data-nave="n1" onclick="cellClick(this)"><rect x="442" y="143" width="46" height="22" rx="2"/><text x="465" y="154" font-size="13">C</text></g>
+        <g class="cell" data-id="D" data-nave="n1" onclick="cellClick(this)"><rect x="489" y="143" width="46" height="22" rx="2"/><text x="512" y="154" font-size="13">D</text></g>
+        <g class="cell" data-id="G" data-nave="n1" onclick="cellClick(this)"><rect x="597" y="65" width="19" height="51" rx="2"/><text x="606" y="91" font-size="11">G</text></g>
+        <g class="cell" data-id="H" data-nave="n1" onclick="cellClick(this)"><rect x="597" y="117" width="19" height="46" rx="2"/><text x="606" y="140" font-size="11">H</text></g>
+        <g class="cell" data-id="I" data-nave="n1" onclick="cellClick(this)"><rect x="597" y="164" width="19" height="47" rx="2"/><text x="606" y="188" font-size="11">I</text></g>
+        <g class="cell" data-id="K" data-nave="n1" onclick="cellClick(this)"><rect x="620" y="65" width="19" height="33" rx="2"/><text x="629" y="82" font-size="11">K</text></g>
+        <g class="cell" data-id="J" data-nave="n1" onclick="cellClick(this)"><rect x="620" y="99" width="19" height="96" rx="2"/><text x="629" y="147" font-size="11">J</text></g>
+        <g class="cell" data-id="N" data-nave="n1" onclick="cellClick(this)"><rect x="318" y="275" width="45" height="28" rx="2"/><text x="340" y="289" font-size="13">N</text></g>
+        <g class="cell" data-id="M" data-nave="n1" onclick="cellClick(this)"><rect x="318" y="304" width="45" height="36" rx="2"/><text x="340" y="322" font-size="13">M</text></g>
+        <g class="cell" data-id="Ñ" data-nave="n1" onclick="cellClick(this)"><rect x="318" y="341" width="45" height="30" rx="2"/><text x="340" y="356" font-size="12">Ñ</text></g>
+        <g class="cell" data-id="X3" data-nave="n1" onclick="cellClick(this)"><rect x="389" y="378" width="21" height="19" rx="2"/><text x="399" y="388" font-size="9">X3</text></g>
+        <g class="cell" data-id="X4" data-nave="n1" onclick="cellClick(this)"><rect x="413" y="378" width="22" height="19" rx="2"/><text x="424" y="388" font-size="9">X4</text></g>
+        <rect x="60" y="460" width="8" height="8" rx="2" fill="#F4F6FA" stroke="rgba(11,28,63,.22)" stroke-width="1"/>
+        <text x="73" y="467" font-family="'Barlow Condensed',monospace" font-size="9" fill="rgba(11,28,63,.4)" letter-spacing="1">ARMARIO</text>
+        <rect x="135" y="460" width="8" height="8" rx="2" fill="#EDEFF3" stroke="rgba(11,28,63,.14)" stroke-dasharray="3,2" stroke-width="1"/>
+        <text x="148" y="467" font-family="'Barlow Condensed',monospace" font-size="9" fill="rgba(11,28,63,.4)" letter-spacing="1">SIN NOMBRE</text>
+      </svg>
+    </div>
+  </div>
+  <div class="bottomnav">
+    <button class="nb" onclick="goInicio()"><svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Inicio</button>
+    <button class="nb" onclick="go('mov')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/><line x1="17" y1="7" x2="7" y2="17"/></svg>Movimientos</button>
+    <button class="nb-wrap" onclick="go('pet')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Peticiones<span class="nav-badge" id="nb-badge-n1" style="display:none"></span></button>
+    <button class="nb" onclick="go('bal')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Balances</button>
+
+    <button class="nb nb-users" onclick="goUsers()"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Usuarios<span class="nav-badge nb-users-badge" style="display:none"></span></button>
+  </div>
+</div>
+
+
+<div id="sc-n2" class="screen">
+  <div class="topbar">
+    <div class="topbar-l">
+      <button class="go-btn" onclick="go('home')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Inicio</button>
+      <button class="go-btn" onclick="switchNave()" title="Cambiar de nave"><svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>Cambiar nave</button>
+      <span class="nave-chip"><svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><path d="M9 22V12h6v10"/></svg>N-2</span>
+      <div><div class="pg-title" id="nav-title-n2" onclick="openRenameNave('n2')" title="Clic para renombrar" style="cursor:pointer;user-select:none">Nave 2</div><div class="pg-sub">Plano de planta</div></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="search-trigger" onclick="openSearch()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Buscar<span class="search-kbd">Ctrl+K</span></button>
+    </div>
+  </div>
+  <div class="map-main" style="position:relative">
+    <div class="fab-wrap">
+      <button class="map-fab" id="fab-n2" onclick="toggleFabMenu('n2')" title="Agregar">+</button>
+      <div class="fab-menu" id="fab-menu-n2">
+        <button class="fm-estante" onclick="fabAction('estante')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18"/></svg>Nuevo estante</button>
+        <button class="fm-prod" onclick="fabAction('producto')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nuevo producto</button>
+        <button class="fm-sumar" onclick="fabAction('sumar')"><svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>Sumar stock</button>
+      </div>
+    </div>
+    <div class="map-canvas">
+      <svg viewBox="0 0 817 505" preserveAspectRatio="xMidYMid meet" style="max-width:100%;max-height:100%;width:auto;height:auto" xmlns="http://www.w3.org/2000/svg">
+        <text x="408" y="28" font-family="'Barlow Condensed',monospace" font-size="20" font-weight="700" fill="rgba(11,28,63,.32)" text-anchor="middle" letter-spacing="5">NAVE 2</text>
+        <g class="cell" data-id="O" data-nave="n2" onclick="cellClick(this)"><rect x="207" y="68" width="73" height="48" rx="3"/><text x="243" y="92" font-size="20">O</text></g>
+        <g class="cell" data-id="Ñ" data-nave="n2" onclick="cellClick(this)"><rect x="282" y="68" width="73" height="48" rx="3"/><text x="318" y="92" font-size="20">Ñ</text></g>
+        <g class="cell" data-id="N" data-nave="n2" onclick="cellClick(this)"><rect x="358" y="68" width="73" height="47" rx="3"/><text x="394" y="92" font-size="20">N</text></g>
+        <g class="cell" data-id="M" data-nave="n2" onclick="cellClick(this)"><rect x="434" y="68" width="20" height="19" rx="2"/><text x="444" y="78" font-size="10">M</text></g>
+        <g class="cell" data-id="K" data-nave="n2" onclick="cellClick(this)"><rect x="456" y="68" width="21" height="19" rx="2"/><text x="466" y="78" font-size="10">K</text></g>
+        <g class="cell" data-id="J" data-nave="n2" onclick="cellClick(this)"><rect x="480" y="68" width="73" height="31" rx="3"/><text x="516" y="84" font-size="16">J</text></g>
+        <g class="cell" data-id="I" data-nave="n2" onclick="cellClick(this)"><rect x="556" y="68" width="73" height="31" rx="3"/><text x="592" y="84" font-size="16">I</text></g>
+        <g class="cell" data-id="H" data-nave="n2" onclick="cellClick(this)"><rect x="472" y="140" width="156" height="46" rx="3"/><text x="550" y="163" font-size="20">H</text></g>
+        <g class="cell" data-id="D" data-nave="n2" onclick="cellClick(this)"><rect x="523" y="217" width="18" height="43" rx="2"/><text x="532" y="239" font-size="11">D</text></g>
+        <g class="cell" data-id="E" data-nave="n2" onclick="cellClick(this)"><rect x="542" y="217" width="42" height="43" rx="2"/><text x="563" y="239" font-size="15">E</text></g>
+        <g class="cell" data-id="F" data-nave="n2" onclick="cellClick(this)"><rect x="585" y="217" width="42" height="43" rx="2"/><text x="606" y="239" font-size="15">F</text></g>
+        <g class="cell" data-id="G" data-nave="n2" onclick="cellClick(this)"><rect x="628" y="217" width="42" height="43" rx="2"/><text x="649" y="239" font-size="15">G</text></g>
+        <g class="cell" data-id="C" data-nave="n2" onclick="cellClick(this)"><rect x="523" y="261" width="18" height="42" rx="2"/><text x="532" y="282" font-size="11">C</text></g>
+        <g class="cell" data-id="B" data-nave="n2" onclick="cellClick(this)"><rect x="523" y="304" width="18" height="43" rx="2"/><text x="532" y="325" font-size="11">B</text></g>
+        <g class="cell" data-id="A" data-nave="n2" onclick="cellClick(this)"><rect x="523" y="348" width="18" height="43" rx="2"/><text x="532" y="370" font-size="11">A</text></g>
+        <rect x="120" y="460" width="8" height="8" rx="2" fill="#F4F6FA" stroke="rgba(11,28,63,.22)" stroke-width="1"/>
+        <text x="133" y="467" font-family="'Barlow Condensed',monospace" font-size="9" fill="rgba(11,28,63,.4)" letter-spacing="1">ARMARIO</text>
+      </svg>
+    </div>
+  </div>
+  <div class="bottomnav">
+    <button class="nb" onclick="goInicio()"><svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Inicio</button>
+    <button class="nb" onclick="go('mov')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/><line x1="17" y1="7" x2="7" y2="17"/></svg>Movimientos</button>
+    <button class="nb-wrap" onclick="go('pet')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Peticiones<span class="nav-badge" id="nb-badge-n2" style="display:none"></span></button>
+    <button class="nb" onclick="go('bal')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Balances</button>
+
+    <button class="nb nb-users" onclick="goUsers()"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Usuarios<span class="nav-badge nb-users-badge" style="display:none"></span></button>
+  </div>
+</div>
+
+
+<div id="sc-mov" class="screen">
+  <div class="topbar">
+    <div class="topbar-l">
+      <button class="go-btn" onclick="goInicio()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Inicio</button>
+      <div><div class="pg-title">MOVIMIENTOS</div><div class="pg-sub">Ingresos y egresos de stock</div></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="display:flex;align-items:center;gap:7px">
+        <label style="font-size:11px;font-weight:600;letter-spacing:.3px;color:var(--muted);white-space:nowrap">Filtrar por fecha</label>
+        <input type="date" id="mov-fecha-inp" onchange="renderMov()"
+          style="height:34px;padding:0 10px;border:1px solid var(--border2);border-radius:10px;background:var(--surface2);color:var(--text);font-family:inherit;font-size:12px;font-weight:600;outline:none;cursor:pointer;transition:border-color .15s"/>
+        <button id="mov-fecha-clear" onclick="clearMovFecha()" title="Ver todos" style="display:none;height:34px;padding:0 11px;border:1px solid var(--border2);border-radius:10px;background:var(--surface2);color:var(--muted);font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap">✕ Limpiar</button>
+      </div>
+      <button id="del-movs-btn" onclick="openDeleteMovsModal()" title="Borrar movimientos antiguos">🗑 Limpiar</button>
+    </div>
+  </div>
+  <div class="mov-main">
+    <div class="filt-row" style="padding:10px 0 4px">
+      <div id="mov-fecha-badge" style="display:none;font-size:12px;font-weight:600;color:var(--accent);background:var(--blue-dim);border:1px solid rgba(13,99,234,.2);border-radius:9px;padding:4px 11px"></div>
+      <button class="pill on" id="pill-mov-todas" onclick="setMovTipo('todas')">Todas</button>
+      <button class="pill ing" id="pill-mov-ingreso" onclick="setMovTipo('ingreso')">Ingresos</button>
+      <button class="pill egr" id="pill-mov-egreso" onclick="setMovTipo('egreso')">Egresos</button>
+      <button class="pill edit" id="pill-mov-edicion" onclick="setMovTipo('edicion')">Ediciones</button>
+      <div style="flex:1"></div>
+      <div class="counter">Mostrando <b id="mVis">0</b> de <b id="mTot">0</b> movimientos</div>
+    </div>
+    <div class="tbl-wrap">
+      <div class="tbl-head">
+        <div class="th">DESCRIPCIÓN</div>
+        <div class="th">DETALLE</div>
+        <div class="th">TOTAL $</div>
+        <div class="th">RESPONSABLE</div>
+        <div class="th">FECHA</div>
+        <div class="th">HORA</div>
+        <div class="th">TIPO</div>
+      </div>
+      <div class="tbl-body" id="mBody">
+        <div class="tbl-empty" id="mEmpty"><svg viewBox="0 0 24 24"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 21V9"/></svg>Sin movimientos registrados</div>
+      </div>
+    </div>
+  </div>
+  <div class="bottomnav">
+    <button class="nb" onclick="goInicio()"><svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Inicio</button>
+    <button class="nb on"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/><line x1="17" y1="7" x2="7" y2="17"/></svg>Movimientos</button>
+    <button class="nb-wrap" onclick="go('pet')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Peticiones<span class="nav-badge" id="nb-badge-mov" style="display:none"></span></button>
+    <button class="nb" onclick="go('bal')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Balances</button>
+
+    <button class="nb nb-users" onclick="goUsers()"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Usuarios<span class="nav-badge nb-users-badge" style="display:none"></span></button>
+  </div>
+</div>
+
+
+<div id="sc-pet" class="screen">
+  <div class="topbar">
+    <div class="topbar-l">
+      <button class="go-btn" onclick="goInicio()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Inicio</button>
+      <div><div class="pg-title">PETICIONES</div><div class="pg-sub">Solicitudes de compra y reposición</div></div>
+    </div>
+    <button class="add-btn" onclick="openPetModal()">+</button>
+  </div>
+  <div style="padding:10px 16px 0;display:flex;gap:8px;align-items:center">
+    <input id="pet-search-inp" type="text" class="login-input" placeholder="🔍  Buscar petición, producto, usuario..." autocomplete="off"
+      oninput="renderPet()" style="flex:1;height:36px;font-size:13px;padding:0 12px;border-radius:11px;min-width:0"/>
+    <button onclick="document.getElementById('pet-search-inp').value='';renderPet()" style="height:36px;padding:0 12px;border:1px solid var(--border2);border-radius:11px;background:var(--surface2);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit">Limpiar</button>
+  </div>
+  <div class="pet-main">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <div class="pill on" data-f="todas" onclick="petFilt(this,'todas')">Todas</div>
+      <div class="pill pend" data-f="pendiente" onclick="petFilt(this,'pendiente')">Pendientes</div>
+      <div class="pill done" data-f="completada" onclick="petFilt(this,'completada')">Aprobadas</div>
+      <div class="pill" data-f="rechazada" onclick="petFilt(this,'rechazada')">Rechazadas</div>
+      <div class="counter" style="margin-left:auto">Mostrando <b id="pVis">0</b> de <b id="pTot">0</b></div>
+    </div>
+    <div id="pCards"></div>
+    <div class="pet-empty" id="pEmpty" style="display:none"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Sin peticiones — presioná + para agregar</div>
+  </div>
+  <div class="bottomnav">
+    <button class="nb" onclick="goInicio()"><svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Inicio</button>
+    <button class="nb" onclick="go('mov')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/><line x1="17" y1="7" x2="7" y2="17"/></svg>Movimientos</button>
+    <button class="nb-wrap on"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Peticiones<span class="nav-badge" id="nb-badge-pet" style="display:none"></span></button>
+    <button class="nb" onclick="go('bal')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Balances</button>
+
+    <button class="nb nb-users" onclick="goUsers()"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Usuarios<span class="nav-badge nb-users-badge" style="display:none"></span></button>
+  </div>
+</div>
+
+<!-- ════════ BALANCES ════════ -->
+<div id="sc-bal" class="screen">
+  <div class="topbar">
+    <div class="topbar-l">
+      <button class="go-btn" onclick="goInicio()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Inicio</button>
+      <div><div class="pg-title">BALANCES</div><div class="pg-sub">Ingresos, egresos y valor del stock</div></div>
+    </div>
+    <button class="search-trigger" onclick="openSearch()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Buscar</button>
+  </div>
+  <div class="bal-main" id="balMain"></div>
+  <div class="bottomnav">
+    <button class="nb" onclick="goInicio()"><svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Inicio</button>
+    <button class="nb" onclick="go('mov')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/><line x1="17" y1="7" x2="7" y2="17"/></svg>Movimientos</button>
+    <button class="nb-wrap" onclick="go('pet')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Peticiones<span class="nav-badge" id="nb-badge-bal" style="display:none"></span></button>
+    <button class="nb on"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Balances</button>
+
+    <button class="nb nb-users" onclick="goUsers()"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Usuarios<span class="nav-badge nb-users-badge" style="display:none"></span></button>
+  </div>
+</div>
+
+<!-- MODAL PETICION -->
+<div class="modal-bg" id="petModal" onclick="if(event.target===this)closePetModal()">
+  <div class="modal">
+    <div class="modal-title">NUEVA PETICIÓN</div>
+    <div class="modal-grid">
+      <div class="mf"><label>Solicitante</label><input type="text" id="pt-usr" placeholder="—" readonly/></div>
+      <div class="mf"><label>Fecha límite de compra</label><input type="date" id="pt-fecha"/></div>
+      <div class="mf"><label>Producto</label><input type="text" id="pt-prod" placeholder="Ej: Tornillos 5cm"/></div>
+      <div class="mf"><label>Cantidad a comprar</label><input type="number" id="pt-cant" placeholder="30" min="1"/></div>
+      <div class="mf"><label>Urgencia</label>
+        <select id="pt-urgencia" style="background:var(--surface2);border:1.5px solid var(--border2);border-radius:8px;color:var(--text);font-family:inherit;font-size:14px;padding:8px 12px;outline:none;letter-spacing:.5px">
+          <option value="normal">Normal</option>
+          <option value="urgente">Urgente</option>
+          <option value="critica">Crítica</option>
+        </select>
+      </div>
+      <div class="mf full"><label>Descripción</label><textarea id="pt-desc" placeholder="Ej: Comprar 30 tornillos para Fiat Cronos — armario A1"></textarea></div>
+      <div class="mf full">
+        <div class="collapse-tog" id="pt-adv-tog" onclick="togglePetAdv()">Opciones avanzadas <span class="chev">▾</span></div>
+        <div class="collapse-panel" id="pt-adv-panel">
+          <div class="mf" style="margin-top:8px"><label>Stock mínimo de referencia</label><input type="number" id="pt-stock-min" placeholder="Opcional — nivel de reposición" min="0"/></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-acts">
+      <button class="m-cancel" onclick="closePetModal()">Cancelar</button>
+      <button class="m-save" onclick="savePeticion()">Guardar petición</button>
+    </div>
+  </div>
+</div>
+
+<div id="sc-bal" class="screen">
+  <div class="topbar">
+    <div class="topbar-l">
+      <button class="go-btn" onclick="goInicio()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Inicio</button>
+      <div><div class="pg-title">BALANCES</div><div class="pg-sub">Ingresos, egresos y valor del stock</div></div>
+    </div>
+    <button class="search-trigger" onclick="openSearch()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Buscar</button>
+  </div>
+  <div class="bal-main" id="balMain"></div>
+  <div class="bottomnav">
+    <button class="nb" onclick="goInicio()"><svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Inicio</button>
+    <button class="nb" onclick="go('mov')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/><line x1="17" y1="7" x2="7" y2="17"/></svg>Movimientos</button>
+    <button class="nb-wrap" onclick="go('pet')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Peticiones<span class="nav-badge" id="nb-badge-bal" style="display:none"></span></button>
+    <button class="nb on"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Balances</button>
+
+    <button class="nb nb-users" onclick="goUsers()"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Usuarios<span class="nav-badge nb-users-badge" style="display:none"></span></button>
+  </div>
+</div>
+
+
+<!-- ════════ NUEVA ESTANTERÍA MODAL ════════ -->
+<div id="new-shelf-modal" onclick="if(event.target===this)closeNewShelfModal()">
+  <div class="ns-box">
+    <div class="ns-title">+ NUEVA ESTANTERÍA</div>
+    <div class="ns-grid">
+      <div class="ns-field">
+        <label class="ns-label">Identificador (1 letra)</label>
+        <input class="ns-input" id="ns-id" type="text" placeholder="Ej: Z, AA…" maxlength="4" autocomplete="off"/>
+      </div>
+      <div class="ns-field">
+        <label class="ns-label">Niveles (repisas)</label>
+        <input class="ns-input" id="ns-repisas" type="number" value="2" min="1" max="10"/>
+      </div>
+      <div class="ns-field">
+        <label class="ns-label">Ancho (cm)</label>
+        <input class="ns-input" id="ns-w" type="number" value="80" min="20" max="500"/>
+      </div>
+      <div class="ns-field">
+        <label class="ns-label">Largo/Fondo (cm)</label>
+        <input class="ns-input" id="ns-h" type="number" value="40" min="20" max="500"/>
+      </div>
+      <div class="ns-field">
+        <label class="ns-label">Color</label>
+        <input class="ns-input" id="ns-color" type="color" value="#16A35A" style="padding:4px;height:38px;cursor:pointer"/>
+      </div>
+      <div class="ns-field">
+        <label class="ns-label">Categoría inicial</label>
+        <input class="ns-input" id="ns-cat" type="text" placeholder="Ej: TORNILLERÍA…"/>
+      </div>
+    </div>
+    <div id="ns-err" style="font-size:10px;color:var(--red);letter-spacing:1px;display:none">Completá ID y verificá que no exista</div>
+    <div class="ns-actions">
+      <button class="ns-cancel" onclick="closeNewShelfModal()">Cancelar</button>
+      <button class="ns-save" onclick="saveNewShelf()">Agregar estantería</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NUEVO PRODUCTO (desde el +) -->
+<div class="modal-bg" id="npModal" onclick="if(event.target===this)closeNpModal()">
+  <div class="modal">
+    <div class="modal-title">NUEVO PRODUCTO</div>
+    <div class="modal-grid">
+      <div class="mf"><label>Estantería (armario)</label>
+        <select id="np-arm" class="ns-select" onchange="npFillRepisas()"></select>
+      </div>
+      <div class="mf"><label>Repisa</label>
+        <select id="np-rep" class="ns-select" onchange="npSyncCatFromRepisa()"></select>
+      </div>
+      <div class="mf"><label>Categoría <span style="font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0">(clasifica la repisa)</span></label>
+        <input type="text" id="np-cat" list="np-cat-list" placeholder="Ej: TORNILLERÍA, RODAMIENTOS…" autocomplete="off" style="text-transform:uppercase"/>
+        <datalist id="np-cat-list"></datalist>
+      </div>
+      <div class="mf"><label>Producto</label><input type="text" id="np-nombre" placeholder="Ej: TORNILLOS 5CM" autocomplete="off"/></div>
+      <div class="mf"><label>Cantidad</label><input type="number" id="np-cant" placeholder="0" min="1"/></div>
+      <div class="mf"><label>Especificación</label><input type="text" id="np-spec" placeholder="Ej: 5CM, 52Ø…"/></div>
+      <div class="mf"><label>Precio ($)</label><input type="number" id="np-precio" step="0.01" min="0" placeholder="0.00"/></div>
+      <div class="mf"><label>Tipo de bien <span style="font-weight:400;color:var(--muted)">(opcional)</span></label><select id="np-tipo-bien" style="font-family:inherit;font-size:13px;padding:8px 10px;border:1px solid var(--border2);border-radius:11px;background:var(--surface2);color:var(--text);outline:none;width:100%"><option value="">— Sin clasificar —</option><option value="cambio">Bien de Cambio (stock, materias primas)</option><option value="uso">Bien de Uso / Patrimonial (activo fijo, maquinaria)</option></select></div>
+      <div class="mf"><label>Stock mínimo (alerta automática)</label><input type="number" id="np-min" placeholder="Ej: 5 — vacío = sin alerta" min="0"/></div>
+      <div class="mf"><label>Fecha</label><input type="date" id="np-fecha"/></div>
+      <div class="mf full">
+        <label>Atributos personalizados <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(opcional · ej. Marca, Material, Proveedor)</span></label>
+        <div id="np-meta-rows"></div>
+        <button type="button" class="np-meta-add" onclick="npAddMetaRow()">+ Agregar atributo</button>
+      </div>
+    </div>
+    <div id="np-err" style="font-size:11px;color:var(--red);display:none;margin-top:6px">Completá armario, producto y cantidad</div>
+    <div class="modal-acts">
+      <button class="m-cancel" onclick="closeNpModal()">Cancelar</button>
+      <button class="m-save" onclick="saveNuevoGlobal()">Guardar producto</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SUMAR STOCK (desde el +) -->
+<div class="modal-bg" id="ssModal" onclick="if(event.target===this)closeSsModal()">
+  <div class="modal">
+    <div class="modal-title">SUMAR STOCK</div>
+    <div class="modal-grid">
+      <div class="mf"><label>Estantería (armario)</label>
+        <select id="ss-arm" class="ns-select" onchange="ssFillRepisas()"></select>
+      </div>
+      <div class="mf"><label>Repisa</label>
+        <select id="ss-rep" class="ns-select" onchange="ssFillProds()"></select>
+      </div>
+      <div class="mf full"><label>Producto existente</label>
+        <select id="ss-prod" class="ns-select"></select>
+      </div>
+      <div class="mf"><label>Cantidad a sumar</label><input type="number" id="ss-cant" placeholder="0" min="1"/></div>
+      <div class="mf"><label>Fecha</label><input type="date" id="ss-fecha"/></div>
+    </div>
+    <div id="ss-err" style="font-size:11px;color:var(--red);display:none;margin-top:6px">Elegí un producto y una cantidad</div>
+    <div class="modal-acts">
+      <button class="m-cancel" onclick="closeSsModal()">Cancelar</button>
+      <button class="m-save" onclick="saveSumarGlobal()">Sumar stock</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DETALLE DE PRODUCTO (B1) -->
+<div class="modal-bg" id="pdModal" onclick="if(event.target===this)closePdModal()">
+  <div class="modal">
+    <div class="modal-title" style="display:flex;justify-content:space-between;align-items:center">
+      <span>DETALLE DE PRODUCTO</span>
+      <button class="pop-x" style="position:static" onclick="closePdModal()">✕</button>
+    </div>
+    <div class="pd-body">
+      <div class="pd-name" id="pd-name">—</div>
+      <div class="pd-sku" id="pd-sku">—</div>
+      <div class="pd-qr"><div id="pd-qr-inner"></div></div>
+      <div class="pd-meta" id="pd-meta"></div>
+    </div>
+    <div class="modal-acts">
+      <button class="m-cancel" onclick="closePdModal()">Cerrar</button>
+      <button class="m-save" id="pd-qr-btn">Ver etiqueta / QR</button>
+    </div>
+  </div>
+</div>
+
+<!-- Capa compartida de popups de armario (sirve para N-1 y N-2) -->
+<div id="pop-layer" onclick="layerClick(event)"></div>
+
+<!-- MODAL CAMBIAR SEDE (post-login) -->
+
+
+<div id="sc-users" class="screen">
+  <div class="topbar">
+    <div class="topbar-l">
+      <button class="go-btn" onclick="goInicio()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Inicio</button>
+      <div><div class="pg-title">GESTIÓN DE USUARIOS</div><div class="pg-sub">Aprobaciones y permisos</div></div>
+    </div>
+    <button class="search-trigger" onclick="openSearch()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Buscar</button>
+  </div>
+  <div class="usr-main">
+    <div id="usr-list"></div>
+  </div>
+  <div class="bottomnav">
+    <button class="nb" onclick="goInicio()"><svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Inicio</button>
+    <button class="nb" onclick="go('mov')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/><line x1="17" y1="7" x2="7" y2="17"/></svg>Movimientos</button>
+    <button class="nb-wrap" onclick="go('pet')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Peticiones</button>
+    <button class="nb" onclick="go('bal')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Balances</button>
+    <button class="nb on"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Usuarios</button>
+  </div>
+</div>
+
+<div id="profile-overlay" onclick="if(event.target===this)closeMyProfile()">
+  <div class="profile-card">
+    <div class="profile-head">
+      <div class="profile-head-title">Mi perfil</div>
+      <button class="profile-close" onclick="closeMyProfile()">✕</button>
+    </div>
+    <div class="profile-body" id="profile-body"><!-- se llena por JS --></div>
+  </div>
+</div>
+<input type="file" id="profile-avatar-input" accept="image/*" style="display:none" onchange="_onAvatarFileSelected(event)"/>
+
+<div class="modal-bg" id="sedeModal" onclick="if(event.target===this)closeSedeModal()">
+  <div class="modal">
+    <div class="modal-title">CAMBIAR DE SEDE</div>
+    <div style="font-size:12px;color:var(--muted);margin:-4px 0 10px">Elegí el lugar en el que estás operando ahora.</div>
+    <div class="sede-opt-grid" id="sede-opt-grid">
+      <div class="sede-opt" data-v="HDS"        onclick="setSede('HDS')">HDS</div>
+      <div class="sede-opt" data-v="Fiat"       onclick="setSede('Fiat')">Fiat</div>
+      <div class="sede-opt" data-v="JAMA"       onclick="setSede('JAMA')">JAMA</div>
+      <div class="sede-opt" data-v="Fiat-Sevel" onclick="setSede('Fiat-Sevel')">Fiat-Sevel</div>
+      <div class="sede-opt" data-v="Volkswagen" onclick="setSede('Volkswagen')">Volkswagen</div>
+      <div class="sede-opt" data-v="Otra"       onclick="setSede('Otra')">Otra</div>
+    </div>
+    <div class="modal-acts">
+      <button class="m-cancel" onclick="closeSedeModal()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+
+<div id="sc-stock" class="screen">
+  <div class="topbar">
+    <div class="topbar-l">
+      <button class="go-btn" onclick="goInicio()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Inicio</button>
+      <div><div class="pg-title">STOCK GENERAL</div><div class="pg-sub">Todos los productos · ambas naves</div></div>
+    </div>
+    <button class="stk-filter-btn" id="stk-filter-btn" onclick="stockToggleFilter()">
+      <svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+      Filtrar<span class="stk-filter-count" id="stk-filter-count" style="display:none">1</span>
+    </button>
+  </div>
+  <div class="stk-main">
+    <div class="stk-searchbar">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="stk-q" type="text" placeholder="Buscar producto o especificación…" autocomplete="off" oninput="stockSearch(this.value)"/>
+      <button class="stk-clear" id="stk-clear" onclick="stockClearSearch()" style="display:none" title="Limpiar búsqueda">✕</button>
+    </div>
+    <div class="stk-chips" id="stk-chips" style="display:none"></div>
+    <div class="stk-summary" id="stk-summary"></div>
+    <div class="stk-list" id="stk-list"></div>
+  </div>
+  <div class="bottomnav">
+    <button class="nb" onclick="goInicio()"><svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Inicio</button>
+    <button class="nb" onclick="go('mov')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/><line x1="17" y1="7" x2="7" y2="17"/></svg>Movimientos</button>
+    <button class="nb-wrap" onclick="go('pet')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Peticiones</button>
+    <button class="nb" onclick="go('bal')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Balances</button>
+    <button class="nb nb-users" onclick="goUsers()"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Usuarios<span class="nav-badge nb-users-badge" style="display:none"></span></button>
+  </div>
+</div>
+
+
+<div id="qr-modal" onclick="if(event.target===this)closeQR()">
+  <div class="qr-box">
+    <div class="qr-title">QR de producto</div>
+    <div class="qr-product-name" id="qr-pname">—</div>
+    <div class="qr-meta-row" id="qr-meta-row"></div>
+    <div class="qr-canvas-wrap">
+      <div id="qr-canvas-inner"></div>
+    </div>
+    <div class="qr-label-strip" id="qr-label-strip"></div>
+    <div class="qr-actions">
+      <button class="qr-btn qr-btn-print" onclick="printQR()">
+        <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Imprimir
+      </button>
+      <button class="qr-btn qr-btn-export" onclick="exportQR()">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Exportar PNG
+      </button>
+    </div>
+    <button class="qr-close" onclick="closeQR()">Cerrar</button>
+  </div>
+</div>
+
+
+<div id="search-modal" onclick="if(event.target===this)closeSearch()">
+  <div class="search-box">
+    <div class="search-input-wrap">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="search-input" type="text" placeholder="Buscar producto, armario…" autocomplete="off" oninput="doSearch(this.value)" onkeydown="searchKeyNav(event)"/>
+      <button class="search-close" onclick="closeSearch()">✕</button>
+    </div>
+    <div class="search-results" id="search-results">
+      <div class="search-empty" id="search-empty">Escribí para buscar en Nave 1 y Nave 2</div>
+    </div>
+    <div class="search-hint">
+      <span><kbd>↑</kbd><kbd>↓</kbd> navegar &nbsp; <kbd>Enter</kbd> seleccionar &nbsp; <kbd>Esc</kbd> cerrar</span>
+      <span>Busca en todas las naves</span>
+    </div>
+  </div>
+</div>
+
+<script>
+
+<div id="pop-layer"></div>
+
+
+<!-- ════════════════════════════════════════
+     Scripts — Orden de carga importa:
+     1. Core (sin deps externas)
+     2. Shared (depende de core)
+     3. Módulos funcionales (dependen de core + shared)
+     4. Bootstrap (inicializa todo al final)
+     ════════════════════════════════════════ -->
+
+<!-- Core -->
+<script src="src/core/constants.js"></script>
+<script src="src/core/storage.js"></script>
+<script src="src/core/utils.js"></script>
+<script src="src/core/auth.js"></script>
+<script src="src/core/router.js"></script>
+
+<!-- Shared -->
+<script src="src/shared/toast.js"></script>
+<script src="src/shared/theme.js"></script>
+<script src="src/shared/a11y.js"></script>
+<script src="src/shared/search.js"></script>
+
+<!-- Login / Sesión -->
+<script src="src/login/login.js"></script>
+
+<!-- Stock: datos → ventanas → editor → formularios → ficha → vista general -->
+<script src="src/stock/stockData.js"></script>
+<script src="src/stock/shelfNames.js"></script>
+<script src="src/stock/shelfWindow.js"></script>
+<script src="src/core/stockBus.js"></script>
+<script src="src/stock/shelfEditor.js"></script>
+<script src="src/stock/productForms.js"></script>
+<script src="src/stock/productDetail.js"></script>
+<script src="src/stock/stock.js"></script>
+
+<!-- Módulos funcionales -->
+<script src="src/movimientos/movimientos.js"></script>
+<script src="src/peticiones/peticiones.js"></script>
+<script src="src/balances/balances.js"></script>
+<script src="src/usuarios/usuarios.js"></script>
+<script src="src/qr/qr.js"></script>
+
+<!-- Módulos de mapa (solo exponen applyNaveNames y hooks de SVG) -->
+<script src="src/mapa_n1/mapa_n1.js"></script>
+<script src="src/mapa_n2/mapa_n2.js"></script>
+
+<!-- Welcome (dismissWelcome) -->
+<script src="src/welcome/welcome.js"></script>
+
+<!-- Bootstrap: punto de arranque, se ejecuta al DOMContentLoaded -->
+<script src="src/core/bootstrap.js"></script>
+
+</body>
+</html>
