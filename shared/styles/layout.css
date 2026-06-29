@@ -1,0 +1,67 @@
+/* ── ROUTER ── */
+.screen{display:none;height:100vh;flex-direction:column;position:relative;z-index:1}
+.screen.on{display:flex;animation:screenIn .4s ease both}
+@keyframes screenIn{from{opacity:0}to{opacity:1}}
+
+/* ── TOPBAR (barra flotante) ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:14px 16px 0;padding:12px 18px;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-sm);flex-shrink:0}
+.topbar-l{display:flex;align-items:center;gap:14px}
+.go-btn{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;letter-spacing:.3px;color:var(--muted);border:1px solid var(--border2);border-radius:10px;padding:7px 12px;cursor:pointer;background:var(--surface);font-family:inherit;transition:all .15s}
+.go-btn:hover{color:var(--accent);border-color:var(--accent);background:var(--blue-dim)}
+.go-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.pg-title{font-family:var(--font-display);font-size:20px;font-weight:700;letter-spacing:-.2px;color:var(--ink)}
+.pg-sub{font-size:11px;font-weight:500;letter-spacing:.2px;color:var(--muted)}
+
+/* ── DOCK INFERIOR (menú que sube) ── */
+.bottomnav{display:flex;align-items:center;justify-content:center;gap:6px;margin:10px auto 14px;padding:7px;border:1px solid var(--border);border-radius:22px;flex-shrink:0;background:var(--surface);box-shadow:var(--shadow)}
+@keyframes dockUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+.nb,.nb-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 20px;border-radius:16px;cursor:pointer;background:none;border:none;color:var(--muted);font-family:inherit;font-size:10px;font-weight:600;letter-spacing:.4px;transition:background .15s,color .15s;position:relative}
+.nb svg,.nb-wrap svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.nb:hover,.nb-wrap:hover{background:var(--surface2);color:var(--text)}
+.nb.on,.nb-wrap.on{color:#fff;background:var(--accent);box-shadow:0 6px 16px rgba(13,99,234,.32)}
+
+/* ── PILLS ── */
+.pill{font-size:11px;font-weight:600;letter-spacing:.3px;padding:6px 14px;border-radius:20px;cursor:pointer;border:1px solid var(--border2);color:var(--muted);background:var(--surface);transition:all .15s;user-select:none}
+.pill.on,.pill:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-dim)}
+.pill.pend.on,.pill.pend:hover{border-color:var(--amber);color:var(--amber);background:var(--amber-dim)}
+.pill.done.on,.pill.done:hover{border-color:var(--green);color:var(--green);background:var(--green-dim)}
+.pill.ing.on,.pill.ing:hover{border-color:var(--green);color:var(--green);background:var(--green-dim)}
+.pill.egr.on,.pill.egr:hover{border-color:var(--red);color:var(--red);background:var(--red-dim)}
+
+/* ── Chip de usuario en topbar ── */
+.usr-chip{display:flex;align-items:center;gap:9px;background:var(--surface2);border:1px solid var(--border);border-radius:13px;padding:5px 6px 5px 11px}
+.usr-chip-id{display:flex;flex-direction:column;line-height:1.15;text-align:right}
+.usr-chip-name{font-size:12px;font-weight:700;color:var(--ink);letter-spacing:.2px}
+.usr-chip-meta{font-size:10px;font-weight:500;color:var(--muted)}
+.usr-chip-av{width:30px;height:30px;border-radius:9px;background:var(--accent);color:#fff;font-family:var(--font-display);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.usr-chip{cursor:pointer;transition:background .12s,border-color .12s}
+.usr-chip:hover{background:var(--surface3);border-color:var(--accent)}
+.usr-chip-av{overflow:hidden}
+.usr-chip-av img{width:100%;height:100%;object-fit:cover}
+/* ── Firma de petición / movimiento ── */
+.pet-sign{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:10.5px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px dashed var(--border)}
+.pet-sign b{color:var(--text);font-weight:600}
+.pet-sign .sg-rol{color:var(--accent);font-weight:600}
+.td-sub{display:block;font-size:10px;color:var(--muted);font-weight:400;margin-top:1px}
+.mf input[readonly]{opacity:.85;cursor:not-allowed}
+.logout-btn{font-size:11px;font-weight:600;letter-spacing:.2px;color:var(--muted);border:1px solid var(--border2);border-radius:10px;padding:6px 12px;cursor:pointer;background:var(--surface);font-family:inherit;transition:all .12s}
+.logout-btn:hover{color:var(--red);border-color:var(--red);background:var(--red-dim)}
+
+/* ── Nav badge ── */
+.nav-badge{position:absolute;top:2px;right:10px;min-width:16px;height:16px;border-radius:8px;background:var(--red);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px;line-height:1;pointer-events:none;border:2px solid var(--surface)}
+.nav-badge.amber{background:var(--amber)}
+.nb-wrap.on .nav-badge{border-color:var(--accent)}
+
+/* alerta pet auto */
+.pet-card.auto-hds{border-color:rgba(229,72,77,.4)}
+.cpill.hds{border-color:rgba(229,72,77,.4);color:var(--red);background:var(--red-dim)}
+
+/* Stock mínimo chip */
+.ir-min-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:1px}
+.stock-min-chip{font-size:9px;letter-spacing:.2px;color:var(--muted);cursor:pointer;padding:1px 6px;border-radius:5px;border:1px dashed var(--border2);transition:all .12s;white-space:nowrap;background:none;font-family:inherit}
+.stock-min-chip:hover{color:var(--amber);border-color:rgba(232,144,42,.5)}
+.stock-min-chip.low{color:var(--red);border-color:rgba(229,72,77,.5);background:var(--red-dim)}
+.item-row.editable{grid-template-columns:1fr 72px 44px 52px 28px;gap:4px}
+.ir-min-input{background:var(--surface2);border:1px solid rgba(232,144,42,.35);border-radius:7px;color:var(--amber);font-family:inherit;font-size:11px;font-weight:700;padding:4px 5px;outline:none;width:100%;text-align:center;transition:border-color .12s}
+.ir-min-input:focus{border-color:var(--amber)}
+.ir-min-label{font-size:8px;letter-spacing:.2px;color:var(--muted);text-align:center}

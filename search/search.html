@@ -1,0 +1,18 @@
+<div id="search-modal" onclick="if(event.target===this)closeSearch()">
+  <div class="search-box">
+    <div class="search-input-wrap">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="search-input" type="text" placeholder="Buscar producto, armario…" autocomplete="off" oninput="doSearch(this.value)" onkeydown="searchKeyNav(event)"/>
+      <button class="search-close" onclick="closeSearch()">✕</button>
+    </div>
+    <div class="search-results" id="search-results">
+      <div class="search-empty" id="search-empty">Escribí para buscar en Nave 1 y Nave 2</div>
+    </div>
+    <div class="search-hint">
+      <span><kbd>↑</kbd><kbd>↓</kbd> navegar &nbsp; <kbd>Enter</kbd> seleccionar &nbsp; <kbd>Esc</kbd> cerrar</span>
+      <span>Busca en todas las naves</span>
+    </div>
+  </div>
+</div>
+
+<script>

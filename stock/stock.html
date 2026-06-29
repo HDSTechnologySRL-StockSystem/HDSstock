@@ -1,0 +1,30 @@
+<div id="sc-stock" class="screen">
+  <div class="topbar">
+    <div class="topbar-l">
+      <button class="go-btn" onclick="goInicio()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Inicio</button>
+      <div><div class="pg-title">STOCK GENERAL</div><div class="pg-sub">Todos los productos · ambas naves</div></div>
+    </div>
+    <button class="stk-filter-btn" id="stk-filter-btn" onclick="stockToggleFilter()">
+      <svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+      Filtrar<span class="stk-filter-count" id="stk-filter-count" style="display:none">1</span>
+    </button>
+  </div>
+  <div class="stk-main">
+    <div class="stk-searchbar">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="stk-q" type="text" placeholder="Buscar producto o especificación…" autocomplete="off" oninput="stockSearch(this.value)"/>
+      <button class="stk-clear" id="stk-clear" onclick="stockClearSearch()" style="display:none" title="Limpiar búsqueda">✕</button>
+    </div>
+    <div class="stk-chips" id="stk-chips" style="display:none"></div>
+    <div class="stk-summary" id="stk-summary"></div>
+    <div class="stk-list" id="stk-list"></div>
+  </div>
+  <div class="bottomnav">
+    <button class="nb" onclick="goInicio()"><svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Inicio</button>
+    <button class="nb" onclick="go('mov')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/><line x1="17" y1="7" x2="7" y2="17"/></svg>Movimientos</button>
+    <button class="nb-wrap" onclick="go('pet')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Peticiones</button>
+    <button class="nb" onclick="go('bal')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Balances</button>
+    <button class="nb nb-users" onclick="goUsers()"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Usuarios<span class="nav-badge nb-users-badge" style="display:none"></span></button>
+  </div>
+</div>
+

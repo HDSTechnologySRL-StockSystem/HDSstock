@@ -1,0 +1,84 @@
+<div id="sc-pet" class="screen">
+  <div class="topbar">
+    <div class="topbar-l">
+      <button class="go-btn" onclick="goInicio()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Inicio</button>
+      <div><div class="pg-title">PETICIONES</div><div class="pg-sub">Solicitudes de compra y reposición</div></div>
+    </div>
+    <button class="add-btn" onclick="openPetModal()">+</button>
+  </div>
+  <div style="padding:10px 16px 0;display:flex;gap:8px;align-items:center">
+    <input id="pet-search-inp" type="text" class="login-input" placeholder="🔍  Buscar petición, producto, usuario..." autocomplete="off"
+      oninput="renderPet()" style="flex:1;height:36px;font-size:13px;padding:0 12px;border-radius:11px;min-width:0"/>
+    <button onclick="document.getElementById('pet-search-inp').value='';renderPet()" style="height:36px;padding:0 12px;border:1px solid var(--border2);border-radius:11px;background:var(--surface2);color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit">Limpiar</button>
+  </div>
+  <div class="pet-main">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <div class="pill on" data-f="todas" onclick="petFilt(this,'todas')">Todas</div>
+      <div class="pill pend" data-f="pendiente" onclick="petFilt(this,'pendiente')">Pendientes</div>
+      <div class="pill done" data-f="completada" onclick="petFilt(this,'completada')">Aprobadas</div>
+      <div class="pill" data-f="rechazada" onclick="petFilt(this,'rechazada')">Rechazadas</div>
+      <div class="counter" style="margin-left:auto">Mostrando <b id="pVis">0</b> de <b id="pTot">0</b></div>
+    </div>
+    <div id="pCards"></div>
+    <div class="pet-empty" id="pEmpty" style="display:none"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Sin peticiones — presioná + para agregar</div>
+  </div>
+  <div class="bottomnav">
+    <button class="nb" onclick="goInicio()"><svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Inicio</button>
+    <button class="nb" onclick="go('mov')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/><line x1="17" y1="7" x2="7" y2="17"/></svg>Movimientos</button>
+    <button class="nb-wrap on"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Peticiones<span class="nav-badge" id="nb-badge-pet" style="display:none"></span></button>
+    <button class="nb" onclick="go('bal')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Balances</button>
+
+    <button class="nb nb-users" onclick="goUsers()"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Usuarios<span class="nav-badge nb-users-badge" style="display:none"></span></button>
+  </div>
+</div>
+
+<!-- ════════ BALANCES ════════ -->
+<div id="sc-bal" class="screen">
+  <div class="topbar">
+    <div class="topbar-l">
+      <button class="go-btn" onclick="goInicio()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Inicio</button>
+      <div><div class="pg-title">BALANCES</div><div class="pg-sub">Ingresos, egresos y valor del stock</div></div>
+    </div>
+    <button class="search-trigger" onclick="openSearch()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Buscar</button>
+  </div>
+  <div class="bal-main" id="balMain"></div>
+  <div class="bottomnav">
+    <button class="nb" onclick="goInicio()"><svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Inicio</button>
+    <button class="nb" onclick="go('mov')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/><line x1="17" y1="7" x2="7" y2="17"/></svg>Movimientos</button>
+    <button class="nb-wrap" onclick="go('pet')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Peticiones<span class="nav-badge" id="nb-badge-bal" style="display:none"></span></button>
+    <button class="nb on"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Balances</button>
+
+    <button class="nb nb-users" onclick="goUsers()"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Usuarios<span class="nav-badge nb-users-badge" style="display:none"></span></button>
+  </div>
+</div>
+
+<!-- MODAL PETICION -->
+<div class="modal-bg" id="petModal" onclick="if(event.target===this)closePetModal()">
+  <div class="modal">
+    <div class="modal-title">NUEVA PETICIÓN</div>
+    <div class="modal-grid">
+      <div class="mf"><label>Solicitante</label><input type="text" id="pt-usr" placeholder="—" readonly/></div>
+      <div class="mf"><label>Fecha límite de compra</label><input type="date" id="pt-fecha"/></div>
+      <div class="mf"><label>Producto</label><input type="text" id="pt-prod" placeholder="Ej: Tornillos 5cm"/></div>
+      <div class="mf"><label>Cantidad a comprar</label><input type="number" id="pt-cant" placeholder="30" min="1"/></div>
+      <div class="mf"><label>Urgencia</label>
+        <select id="pt-urgencia" style="background:var(--surface2);border:1.5px solid var(--border2);border-radius:8px;color:var(--text);font-family:inherit;font-size:14px;padding:8px 12px;outline:none;letter-spacing:.5px">
+          <option value="normal">Normal</option>
+          <option value="urgente">Urgente</option>
+          <option value="critica">Crítica</option>
+        </select>
+      </div>
+      <div class="mf full"><label>Descripción</label><textarea id="pt-desc" placeholder="Ej: Comprar 30 tornillos para Fiat Cronos — armario A1"></textarea></div>
+      <div class="mf full">
+        <div class="collapse-tog" id="pt-adv-tog" onclick="togglePetAdv()">Opciones avanzadas <span class="chev">▾</span></div>
+        <div class="collapse-panel" id="pt-adv-panel">
+          <div class="mf" style="margin-top:8px"><label>Stock mínimo de referencia</label><input type="number" id="pt-stock-min" placeholder="Opcional — nivel de reposición" min="0"/></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-acts">
+      <button class="m-cancel" onclick="closePetModal()">Cancelar</button>
+      <button class="m-save" onclick="savePeticion()">Guardar petición</button>
+    </div>
+  </div>
+</div>

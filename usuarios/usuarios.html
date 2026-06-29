@@ -1,0 +1,49 @@
+<div id="sc-users" class="screen">
+  <div class="topbar">
+    <div class="topbar-l">
+      <button class="go-btn" onclick="goInicio()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Inicio</button>
+      <div><div class="pg-title">GESTIÓN DE USUARIOS</div><div class="pg-sub">Aprobaciones y permisos</div></div>
+    </div>
+    <button class="search-trigger" onclick="openSearch()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Buscar</button>
+  </div>
+  <div class="usr-main">
+    <div id="usr-list"></div>
+  </div>
+  <div class="bottomnav">
+    <button class="nb" onclick="goInicio()"><svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Inicio</button>
+    <button class="nb" onclick="go('mov')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/><line x1="17" y1="7" x2="7" y2="17"/></svg>Movimientos</button>
+    <button class="nb-wrap" onclick="go('pet')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Peticiones</button>
+    <button class="nb" onclick="go('bal')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Balances</button>
+    <button class="nb on"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Usuarios</button>
+  </div>
+</div>
+
+<div id="profile-overlay" onclick="if(event.target===this)closeMyProfile()">
+  <div class="profile-card">
+    <div class="profile-head">
+      <div class="profile-head-title">Mi perfil</div>
+      <button class="profile-close" onclick="closeMyProfile()">✕</button>
+    </div>
+    <div class="profile-body" id="profile-body"><!-- se llena por JS --></div>
+  </div>
+</div>
+<input type="file" id="profile-avatar-input" accept="image/*" style="display:none" onchange="_onAvatarFileSelected(event)"/>
+
+<div class="modal-bg" id="sedeModal" onclick="if(event.target===this)closeSedeModal()">
+  <div class="modal">
+    <div class="modal-title">CAMBIAR DE SEDE</div>
+    <div style="font-size:12px;color:var(--muted);margin:-4px 0 10px">Elegí el lugar en el que estás operando ahora.</div>
+    <div class="sede-opt-grid" id="sede-opt-grid">
+      <div class="sede-opt" data-v="HDS"        onclick="setSede('HDS')">HDS</div>
+      <div class="sede-opt" data-v="Fiat"       onclick="setSede('Fiat')">Fiat</div>
+      <div class="sede-opt" data-v="JAMA"       onclick="setSede('JAMA')">JAMA</div>
+      <div class="sede-opt" data-v="Fiat-Sevel" onclick="setSede('Fiat-Sevel')">Fiat-Sevel</div>
+      <div class="sede-opt" data-v="Volkswagen" onclick="setSede('Volkswagen')">Volkswagen</div>
+      <div class="sede-opt" data-v="Otra"       onclick="setSede('Otra')">Otra</div>
+    </div>
+    <div class="modal-acts">
+      <button class="m-cancel" onclick="closeSedeModal()">Cerrar</button>
+    </div>
+  </div>
+</div>
+

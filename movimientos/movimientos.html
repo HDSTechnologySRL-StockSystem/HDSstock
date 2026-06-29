@@ -1,0 +1,51 @@
+<div id="sc-mov" class="screen">
+  <div class="topbar">
+    <div class="topbar-l">
+      <button class="go-btn" onclick="goInicio()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Inicio</button>
+      <div><div class="pg-title">MOVIMIENTOS</div><div class="pg-sub">Ingresos y egresos de stock</div></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="display:flex;align-items:center;gap:7px">
+        <label style="font-size:11px;font-weight:600;letter-spacing:.3px;color:var(--muted);white-space:nowrap">Filtrar por fecha</label>
+        <input type="date" id="mov-fecha-inp" onchange="renderMov()"
+          style="height:34px;padding:0 10px;border:1px solid var(--border2);border-radius:10px;background:var(--surface2);color:var(--text);font-family:inherit;font-size:12px;font-weight:600;outline:none;cursor:pointer;transition:border-color .15s"/>
+        <button id="mov-fecha-clear" onclick="clearMovFecha()" title="Ver todos" style="display:none;height:34px;padding:0 11px;border:1px solid var(--border2);border-radius:10px;background:var(--surface2);color:var(--muted);font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap">✕ Limpiar</button>
+      </div>
+      <button id="del-movs-btn" onclick="openDeleteMovsModal()" title="Borrar movimientos antiguos">🗑 Limpiar</button>
+    </div>
+  </div>
+  <div class="mov-main">
+    <div class="filt-row" style="padding:10px 0 4px">
+      <div id="mov-fecha-badge" style="display:none;font-size:12px;font-weight:600;color:var(--accent);background:var(--blue-dim);border:1px solid rgba(13,99,234,.2);border-radius:9px;padding:4px 11px"></div>
+      <button class="pill on" id="pill-mov-todas" onclick="setMovTipo('todas')">Todas</button>
+      <button class="pill ing" id="pill-mov-ingreso" onclick="setMovTipo('ingreso')">Ingresos</button>
+      <button class="pill egr" id="pill-mov-egreso" onclick="setMovTipo('egreso')">Egresos</button>
+      <button class="pill edit" id="pill-mov-edicion" onclick="setMovTipo('edicion')">Ediciones</button>
+      <div style="flex:1"></div>
+      <div class="counter">Mostrando <b id="mVis">0</b> de <b id="mTot">0</b> movimientos</div>
+    </div>
+    <div class="tbl-wrap">
+      <div class="tbl-head">
+        <div class="th">DESCRIPCIÓN</div>
+        <div class="th">DETALLE</div>
+        <div class="th">TOTAL $</div>
+        <div class="th">RESPONSABLE</div>
+        <div class="th">FECHA</div>
+        <div class="th">HORA</div>
+        <div class="th">TIPO</div>
+      </div>
+      <div class="tbl-body" id="mBody">
+        <div class="tbl-empty" id="mEmpty"><svg viewBox="0 0 24 24"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 21V9"/></svg>Sin movimientos registrados</div>
+      </div>
+    </div>
+  </div>
+  <div class="bottomnav">
+    <button class="nb" onclick="goInicio()"><svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Inicio</button>
+    <button class="nb on"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/><line x1="17" y1="7" x2="7" y2="17"/></svg>Movimientos</button>
+    <button class="nb-wrap" onclick="go('pet')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Peticiones<span class="nav-badge" id="nb-badge-mov" style="display:none"></span></button>
+    <button class="nb" onclick="go('bal')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Balances</button>
+
+    <button class="nb nb-users" onclick="goUsers()"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Usuarios<span class="nav-badge nb-users-badge" style="display:none"></span></button>
+  </div>
+</div>
+

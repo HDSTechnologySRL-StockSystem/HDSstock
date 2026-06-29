@@ -1,0 +1,54 @@
+<div id="sc-home" class="screen">
+  <div class="topbar">
+    <div class="topbar-l">
+      <div><div class="pg-title">HDS</div><div class="pg-sub">Sistema de Stock · <span style="color:var(--accent);font-weight:700">v2.9</span></div></div>
+      <button class="sede-btn" id="sede-btn" onclick="openSedeModal()" title="Cambiar de sede"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg><span id="sede-btn-label">HDS</span></button>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="search-trigger" onclick="openSearch()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Buscar</button>
+      <div class="usr-chip" id="usr-chip-btn" onclick="openMyProfile()" title="Ver mi perfil" role="button" tabindex="0">
+        <div class="usr-chip-id">
+          <span class="usr-chip-name" id="home-usr-label"></span>
+          <span class="usr-chip-meta"><span id="home-rol-label"></span></span>
+        </div>
+        <div class="usr-chip-av" id="home-usr-av"></div>
+      </div>
+      <button class="logout-btn" onclick="logout()">SALIR</button>
+    </div>
+  </div>
+  <div class="wrap">
+    <div>
+      <div class="logo-row"><div class="logo-box">HDS</div><div class="logo-name">HDS</div></div>
+      <div class="logo-sub">Sistema de Stock</div>
+    </div>
+    <div class="divider"></div>
+    <div class="sec-label">Elegí tu nave</div>
+    <div class="naves">
+      <div class="nave-card" onclick="go('n1')">
+        <div class="nave-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><path d="M9 22V12h6v10"/></svg></div>
+        <div class="nave-num">N-1</div><div class="nave-lbl" id="nave-lbl-n1">Nave 1</div>
+      </div>
+      <div class="nave-card" onclick="go('n2')">
+        <div class="nave-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><path d="M9 22V12h6v10"/></svg></div>
+        <div class="nave-num">N-2</div><div class="nave-lbl" id="nave-lbl-n2">Nave 2</div>
+      </div>
+    </div>
+    <div id="home-admin-card" style="display:none;margin-top:22px;width:100%">
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;text-align:center">Administración</div>
+      <div style="display:flex;gap:14px;justify-content:center">
+        <div class="nave-card" onclick="goUsers()" style="width:180px;height:120px;flex-direction:row;gap:12px;padding:0 20px">
+          <div class="nave-icon" style="width:36px;height:36px"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+          <div><div class="nave-num" style="font-size:14px">Usuarios</div><div class="nave-lbl">Gestión y permisos</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bottomnav">
+    <button class="nb on"><svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Inicio</button>
+    <button class="nb" onclick="go('mov')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/><line x1="17" y1="7" x2="7" y2="17"/></svg>Movimientos</button>
+    <button class="nb-wrap" onclick="go('pet')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Peticiones<span class="nav-badge" id="nb-badge-home" style="display:none"></span></button>
+    <button class="nb" onclick="go('bal')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Balances</button>
+    <button class="nb nb-users" onclick="goUsers()"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Usuarios<span class="nav-badge nb-users-badge" style="display:none"></span></button>
+  </div>
+</div>
+

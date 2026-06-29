@@ -1,0 +1,33 @@
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* ── Paleta nueva (ref. del usuario) ── */
+  --desk:#E8EAEE;            /* fondo "escritorio" gris claro */
+  --bg:#E8EAEE;
+  --surface:#FFFFFF;          /* tarjetas */
+  --surface2:#F3F5F9;         /* relleno sutil / inputs / hover */
+  --surface3:#ECEFF4;
+  --ink:#000E2B;              /* títulos más oscuros */
+  --text:#0B1C3F;             /* texto principal */
+  --muted:#6B7A93;            /* texto secundario */
+  --border:rgba(11,28,63,.08);
+  --border2:rgba(11,28,63,.14);
+  --accent:#0D63EA;           /* azul primario (acciones) */
+  --blue:#0D63EA;
+  --blue-dim:rgba(13,99,234,.10);
+  --green:#16A35A;--green-dim:rgba(22,163,90,.12);
+  --red:#E5484D;--red-dim:rgba(229,72,77,.12);
+  --amber:#E8902A;--amber-dim:rgba(232,144,42,.14);
+  --shadow-sm:0 1px 2px rgba(11,28,63,.06);
+  --shadow:0 1px 2px rgba(11,28,63,.05),0 12px 30px rgba(11,28,63,.07);
+  --shadow-lg:0 24px 60px rgba(11,28,63,.18);
+  --radius:18px;
+  --font-ui:'Inter',system-ui,-apple-system,sans-serif;
+  --font-display:'Sora','Inter',sans-serif;
+  --font-mono:'Barlow Condensed',monospace;
+}
+html,body{height:100%;background:var(--desk);font-family:var(--font-ui);color:var(--text);overflow:hidden;-webkit-font-smoothing:antialiased}
+/* blueprint sutil sobre el escritorio */
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(11,28,63,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(11,28,63,.022) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+body::after{content:none}
+

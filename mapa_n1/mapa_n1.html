@@ -1,0 +1,67 @@
+<div id="sc-n1" class="screen">
+  <div class="topbar">
+    <div class="topbar-l">
+      <button class="go-btn" onclick="go('home')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Inicio</button>
+      <button class="go-btn" onclick="switchNave()" title="Cambiar de nave"><svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>Cambiar nave</button>
+      <span class="nave-chip"><svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><path d="M9 22V12h6v10"/></svg>N-1</span>
+      <div><div class="pg-title" id="nav-title-n1" onclick="openRenameNave('n1')" title="Clic para renombrar" style="cursor:pointer;user-select:none">Nave 1</div><div class="pg-sub">Plano de planta</div></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button class="search-trigger" onclick="openSearch()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Buscar<span class="search-kbd">Ctrl+K</span></button>
+    </div>
+  </div>
+  <div class="map-main" style="position:relative">
+    <div class="fab-wrap">
+      <button class="map-fab" id="fab-n1" onclick="toggleFabMenu('n1')" title="Agregar">+</button>
+      <div class="fab-menu" id="fab-menu-n1">
+        <button class="fm-estante" onclick="fabAction('estante')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18"/></svg>Nuevo estante</button>
+        <button class="fm-prod" onclick="fabAction('producto')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nuevo producto</button>
+        <button class="fm-sumar" onclick="fabAction('sumar')"><svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>Sumar stock</button>
+      </div>
+    </div>
+    <div class="map-canvas">
+      <svg viewBox="0 0 818 501" preserveAspectRatio="xMidYMid meet" style="max-width:100%;max-height:100%;width:auto;height:auto" xmlns="http://www.w3.org/2000/svg">
+        <text x="409" y="28" font-family="'Barlow Condensed',monospace" font-size="20" font-weight="700" fill="rgba(11,28,63,.32)" text-anchor="middle" letter-spacing="5">NAVE 1</text>
+        <g class="cell" data-id="U" data-nave="n1" onclick="cellClick(this)"><rect x="140" y="65" width="91" height="51" rx="3"/><text x="185" y="91" font-size="20">U</text></g>
+        <g class="cell" data-id="R" data-nave="n1" onclick="cellClick(this)"><rect x="236" y="65" width="19" height="51" rx="2"/><text x="245" y="91" font-size="11">R</text></g>
+        <g class="cell" data-id="O" data-nave="n1" onclick="cellClick(this)"><rect x="258" y="65" width="19" height="51" rx="2"/><text x="267" y="91" font-size="11">O</text></g>
+        <g class="cell" data-id="V" data-nave="n1" onclick="cellClick(this)"><rect x="281" y="65" width="45" height="51" rx="3"/><text x="303" y="91" font-size="16">V</text></g>
+        <g class="cell" data-id="S" data-nave="n1" onclick="cellClick(this)"><rect x="236" y="117" width="19" height="46" rx="2"/><text x="245" y="140" font-size="11">S</text></g>
+        <g class="cell" data-id="P" data-nave="n1" onclick="cellClick(this)"><rect x="258" y="117" width="19" height="46" rx="2"/><text x="267" y="140" font-size="11">P</text></g>
+        <g class="cell" data-id="T" data-nave="n1" onclick="cellClick(this)"><rect x="236" y="164" width="19" height="47" rx="2"/><text x="245" y="188" font-size="11">T</text></g>
+        <g class="cell" data-id="Q" data-nave="n1" onclick="cellClick(this)"><rect x="258" y="164" width="19" height="47" rx="2"/><text x="267" y="188" font-size="11">Q</text></g>
+        <g class="cell" data-id="X1" data-nave="n1" onclick="cellClick(this)"><rect x="389" y="65" width="21" height="27" rx="2"/><text x="399" y="79" font-size="9">X1</text></g>
+        <g class="cell" data-id="X2" data-nave="n1" onclick="cellClick(this)"><rect x="413" y="65" width="22" height="27" rx="2"/><text x="424" y="79" font-size="9">X2</text></g>
+        <g class="cell" data-id="F" data-nave="n1" onclick="cellClick(this)"><rect x="491" y="65" width="44" height="27" rx="2"/><text x="513" y="79" font-size="13">F</text></g>
+        <g class="cell" data-id="E" data-nave="n1" onclick="cellClick(this)"><rect x="491" y="93" width="44" height="47" rx="2"/><text x="513" y="117" font-size="14">E</text></g>
+        <g class="cell" data-id="A" data-nave="n1" onclick="cellClick(this)"><rect x="347" y="143" width="47" height="22" rx="2"/><text x="370" y="154" font-size="13">A</text></g>
+        <g class="cell" data-id="B" data-nave="n1" onclick="cellClick(this)"><rect x="395" y="143" width="46" height="22" rx="2"/><text x="418" y="154" font-size="13">B</text></g>
+        <g class="cell" data-id="C" data-nave="n1" onclick="cellClick(this)"><rect x="442" y="143" width="46" height="22" rx="2"/><text x="465" y="154" font-size="13">C</text></g>
+        <g class="cell" data-id="D" data-nave="n1" onclick="cellClick(this)"><rect x="489" y="143" width="46" height="22" rx="2"/><text x="512" y="154" font-size="13">D</text></g>
+        <g class="cell" data-id="G" data-nave="n1" onclick="cellClick(this)"><rect x="597" y="65" width="19" height="51" rx="2"/><text x="606" y="91" font-size="11">G</text></g>
+        <g class="cell" data-id="H" data-nave="n1" onclick="cellClick(this)"><rect x="597" y="117" width="19" height="46" rx="2"/><text x="606" y="140" font-size="11">H</text></g>
+        <g class="cell" data-id="I" data-nave="n1" onclick="cellClick(this)"><rect x="597" y="164" width="19" height="47" rx="2"/><text x="606" y="188" font-size="11">I</text></g>
+        <g class="cell" data-id="K" data-nave="n1" onclick="cellClick(this)"><rect x="620" y="65" width="19" height="33" rx="2"/><text x="629" y="82" font-size="11">K</text></g>
+        <g class="cell" data-id="J" data-nave="n1" onclick="cellClick(this)"><rect x="620" y="99" width="19" height="96" rx="2"/><text x="629" y="147" font-size="11">J</text></g>
+        <g class="cell" data-id="N" data-nave="n1" onclick="cellClick(this)"><rect x="318" y="275" width="45" height="28" rx="2"/><text x="340" y="289" font-size="13">N</text></g>
+        <g class="cell" data-id="M" data-nave="n1" onclick="cellClick(this)"><rect x="318" y="304" width="45" height="36" rx="2"/><text x="340" y="322" font-size="13">M</text></g>
+        <g class="cell" data-id="Ñ" data-nave="n1" onclick="cellClick(this)"><rect x="318" y="341" width="45" height="30" rx="2"/><text x="340" y="356" font-size="12">Ñ</text></g>
+        <g class="cell" data-id="X3" data-nave="n1" onclick="cellClick(this)"><rect x="389" y="378" width="21" height="19" rx="2"/><text x="399" y="388" font-size="9">X3</text></g>
+        <g class="cell" data-id="X4" data-nave="n1" onclick="cellClick(this)"><rect x="413" y="378" width="22" height="19" rx="2"/><text x="424" y="388" font-size="9">X4</text></g>
+        <rect x="60" y="460" width="8" height="8" rx="2" fill="#F4F6FA" stroke="rgba(11,28,63,.22)" stroke-width="1"/>
+        <text x="73" y="467" font-family="'Barlow Condensed',monospace" font-size="9" fill="rgba(11,28,63,.4)" letter-spacing="1">ARMARIO</text>
+        <rect x="135" y="460" width="8" height="8" rx="2" fill="#EDEFF3" stroke="rgba(11,28,63,.14)" stroke-dasharray="3,2" stroke-width="1"/>
+        <text x="148" y="467" font-family="'Barlow Condensed',monospace" font-size="9" fill="rgba(11,28,63,.4)" letter-spacing="1">SIN NOMBRE</text>
+      </svg>
+    </div>
+  </div>
+  <div class="bottomnav">
+    <button class="nb" onclick="goInicio()"><svg viewBox="0 0 24 24"><path d="M3 9l9-6 9 6v11a1 1 0 01-1 1H4a1 1 0 01-1-1z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Inicio</button>
+    <button class="nb" onclick="go('mov')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/><line x1="17" y1="7" x2="7" y2="17"/></svg>Movimientos</button>
+    <button class="nb-wrap" onclick="go('pet')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Peticiones<span class="nav-badge" id="nb-badge-n1" style="display:none"></span></button>
+    <button class="nb" onclick="go('bal')"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Balances</button>
+
+    <button class="nb nb-users" onclick="goUsers()"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>Usuarios<span class="nav-badge nb-users-badge" style="display:none"></span></button>
+  </div>
+</div>
+

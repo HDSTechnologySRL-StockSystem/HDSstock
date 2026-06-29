@@ -1,0 +1,124 @@
+<!-- ════════ NUEVA ESTANTERÍA MODAL ════════ -->
+<div id="new-shelf-modal" onclick="if(event.target===this)closeNewShelfModal()">
+  <div class="ns-box">
+    <div class="ns-title">+ NUEVA ESTANTERÍA</div>
+    <div class="ns-grid">
+      <div class="ns-field">
+        <label class="ns-label">Identificador (1 letra)</label>
+        <input class="ns-input" id="ns-id" type="text" placeholder="Ej: Z, AA…" maxlength="4" autocomplete="off"/>
+      </div>
+      <div class="ns-field">
+        <label class="ns-label">Niveles (repisas)</label>
+        <input class="ns-input" id="ns-repisas" type="number" value="2" min="1" max="10"/>
+      </div>
+      <div class="ns-field">
+        <label class="ns-label">Ancho (cm)</label>
+        <input class="ns-input" id="ns-w" type="number" value="80" min="20" max="500"/>
+      </div>
+      <div class="ns-field">
+        <label class="ns-label">Largo/Fondo (cm)</label>
+        <input class="ns-input" id="ns-h" type="number" value="40" min="20" max="500"/>
+      </div>
+      <div class="ns-field">
+        <label class="ns-label">Color</label>
+        <input class="ns-input" id="ns-color" type="color" value="#16A35A" style="padding:4px;height:38px;cursor:pointer"/>
+      </div>
+      <div class="ns-field">
+        <label class="ns-label">Categoría inicial</label>
+        <input class="ns-input" id="ns-cat" type="text" placeholder="Ej: TORNILLERÍA…"/>
+      </div>
+    </div>
+    <div id="ns-err" style="font-size:10px;color:var(--red);letter-spacing:1px;display:none">Completá ID y verificá que no exista</div>
+    <div class="ns-actions">
+      <button class="ns-cancel" onclick="closeNewShelfModal()">Cancelar</button>
+      <button class="ns-save" onclick="saveNewShelf()">Agregar estantería</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NUEVO PRODUCTO (desde el +) -->
+<div class="modal-bg" id="npModal" onclick="if(event.target===this)closeNpModal()">
+  <div class="modal">
+    <div class="modal-title">NUEVO PRODUCTO</div>
+    <div class="modal-grid">
+      <div class="mf"><label>Estantería (armario)</label>
+        <select id="np-arm" class="ns-select" onchange="npFillRepisas()"></select>
+      </div>
+      <div class="mf"><label>Repisa</label>
+        <select id="np-rep" class="ns-select" onchange="npSyncCatFromRepisa()"></select>
+      </div>
+      <div class="mf"><label>Categoría <span style="font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0">(clasifica la repisa)</span></label>
+        <input type="text" id="np-cat" list="np-cat-list" placeholder="Ej: TORNILLERÍA, RODAMIENTOS…" autocomplete="off" style="text-transform:uppercase"/>
+        <datalist id="np-cat-list"></datalist>
+      </div>
+      <div class="mf"><label>Producto</label><input type="text" id="np-nombre" placeholder="Ej: TORNILLOS 5CM" autocomplete="off"/></div>
+      <div class="mf"><label>Cantidad</label><input type="number" id="np-cant" placeholder="0" min="1"/></div>
+      <div class="mf"><label>Especificación</label><input type="text" id="np-spec" placeholder="Ej: 5CM, 52Ø…"/></div>
+      <div class="mf"><label>Precio ($)</label><input type="number" id="np-precio" step="0.01" min="0" placeholder="0.00"/></div>
+      <div class="mf"><label>Tipo de bien <span style="font-weight:400;color:var(--muted)">(opcional)</span></label><select id="np-tipo-bien" style="font-family:inherit;font-size:13px;padding:8px 10px;border:1px solid var(--border2);border-radius:11px;background:var(--surface2);color:var(--text);outline:none;width:100%"><option value="">— Sin clasificar —</option><option value="cambio">Bien de Cambio (stock, materias primas)</option><option value="uso">Bien de Uso / Patrimonial (activo fijo, maquinaria)</option></select></div>
+      <div class="mf"><label>Stock mínimo (alerta automática)</label><input type="number" id="np-min" placeholder="Ej: 5 — vacío = sin alerta" min="0"/></div>
+      <div class="mf"><label>Fecha</label><input type="date" id="np-fecha"/></div>
+      <div class="mf full">
+        <label>Atributos personalizados <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(opcional · ej. Marca, Material, Proveedor)</span></label>
+        <div id="np-meta-rows"></div>
+        <button type="button" class="np-meta-add" onclick="npAddMetaRow()">+ Agregar atributo</button>
+      </div>
+    </div>
+    <div id="np-err" style="font-size:11px;color:var(--red);display:none;margin-top:6px">Completá armario, producto y cantidad</div>
+    <div class="modal-acts">
+      <button class="m-cancel" onclick="closeNpModal()">Cancelar</button>
+      <button class="m-save" onclick="saveNuevoGlobal()">Guardar producto</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SUMAR STOCK (desde el +) -->
+<div class="modal-bg" id="ssModal" onclick="if(event.target===this)closeSsModal()">
+  <div class="modal">
+    <div class="modal-title">SUMAR STOCK</div>
+    <div class="modal-grid">
+      <div class="mf"><label>Estantería (armario)</label>
+        <select id="ss-arm" class="ns-select" onchange="ssFillRepisas()"></select>
+      </div>
+      <div class="mf"><label>Repisa</label>
+        <select id="ss-rep" class="ns-select" onchange="ssFillProds()"></select>
+      </div>
+      <div class="mf full"><label>Producto existente</label>
+        <select id="ss-prod" class="ns-select"></select>
+      </div>
+      <div class="mf"><label>Cantidad a sumar</label><input type="number" id="ss-cant" placeholder="0" min="1"/></div>
+      <div class="mf"><label>Fecha</label><input type="date" id="ss-fecha"/></div>
+    </div>
+    <div id="ss-err" style="font-size:11px;color:var(--red);display:none;margin-top:6px">Elegí un producto y una cantidad</div>
+    <div class="modal-acts">
+      <button class="m-cancel" onclick="closeSsModal()">Cancelar</button>
+      <button class="m-save" onclick="saveSumarGlobal()">Sumar stock</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DETALLE DE PRODUCTO (B1) -->
+<div class="modal-bg" id="pdModal" onclick="if(event.target===this)closePdModal()">
+  <div class="modal">
+    <div class="modal-title" style="display:flex;justify-content:space-between;align-items:center">
+      <span>DETALLE DE PRODUCTO</span>
+      <button class="pop-x" style="position:static" onclick="closePdModal()">✕</button>
+    </div>
+    <div class="pd-body">
+      <div class="pd-name" id="pd-name">—</div>
+      <div class="pd-sku" id="pd-sku">—</div>
+      <div class="pd-qr"><div id="pd-qr-inner"></div></div>
+      <div class="pd-meta" id="pd-meta"></div>
+    </div>
+    <div class="modal-acts">
+      <button class="m-cancel" onclick="closePdModal()">Cerrar</button>
+      <button class="m-save" id="pd-qr-btn">Ver etiqueta / QR</button>
+    </div>
+  </div>
+</div>
+
+<!-- Capa compartida de popups de armario (sirve para N-1 y N-2) -->
+<div id="pop-layer" onclick="layerClick(event)"></div>
+
+<!-- MODAL CAMBIAR SEDE (post-login) -->
+

@@ -1,0 +1,28 @@
+<div id="sc-login" class="screen on">
+  <div class="wrap">
+    <div class="login-card-shell">
+      <div class="login-brand">H</div>
+      <div class="login-title" id="login-mode-title">Ingresar</div>
+      <div class="login-hint">Sistema de stock · HDS S.R.L.</div>
+      <div class="login-fields">
+        <div class="login-input-wrap">
+          <input class="login-input" id="li-usr" type="text" placeholder="Usuario" autocomplete="off" maxlength="30"/>
+        </div>
+        <div class="login-input-wrap">
+          <input class="login-input" id="li-pass" type="password" placeholder="Contraseña" maxlength="30"/>
+        </div>
+        <div class="login-input-wrap" id="li-pass2-wrap" style="display:none">
+          <input class="login-input" id="li-pass2" type="password" placeholder="Repetir contraseña" maxlength="30"/>
+        </div>
+        <div class="login-input-wrap" id="li-mail-wrap" style="display:none">
+          <input class="login-input" id="li-mail" type="email" placeholder="Correo electrónico (opcional)" autocomplete="off" maxlength="80"/>
+        </div>
+      </div>
+      <div class="login-err" id="li-err"></div>
+      <button class="login-btn primary" id="li-main-btn" onclick="loginSubmit()">Ingresar</button>
+      <button class="login-btn" id="li-sec-btn" onclick="loginToggleMode()">Crear cuenta</button>
+      <button class="login-link" id="li-forgot-btn" onclick="openForgotPassword()">¿Olvidaste tu contraseña?</button>
+    </div>
+  </div>
+</div>
+

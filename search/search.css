@@ -1,0 +1,53 @@
+   BALANCES — MOBILE-FIRST (≤768px)
+   Objetivo: lectura vertical, cero scroll horizontal, datos densos
+   pero legibles. Las tarjetas apilan; las barras pasan a layout
+   "nombre + valor arriba / barra full-width abajo".
+   ════════════════════════════════════════════════════════════════════ */
+@media (max-width:768px){
+  .bal-main{padding:12px 12px;gap:12px}
+
+  /* KPIs: 2 columnas, números algo más chicos */
+  .bal-kpis{grid-template-columns:1fr 1fr;gap:10px}
+  .kpi{padding:13px 14px}
+  .kpi-val{font-size:1.55rem}
+  .kpi-ico{top:11px;right:11px;width:26px;height:26px}
+
+  /* Las dos columnas de tarjetas se apilan */
+  .bal-cols{grid-template-columns:1fr;gap:12px}
+  .bal-card{padding:15px}
+
+  /* ── Barras: de grilla horizontal → bloque vertical ──
+     Antes: [nombre | barra | valor] en una fila (forzaba ancho).
+     Ahora: fila 1 = nombre + valor; fila 2 = barra a todo el ancho. */
+  .bar-row{
+    grid-template-columns:1fr auto;
+    grid-template-areas:"name val" "track track";
+    gap:5px 10px;min-width:0;align-items:center;
+    padding:7px 0;border-bottom:1px solid var(--border);
+  }
+  .bal-card .bar-row:last-child{border-bottom:none}
+  .bar-name{grid-area:name;white-space:normal;font-size:.82rem;line-height:1.25}
+  .bar-val {grid-area:val;font-size:.82rem;min-width:0!important}
+  .bar-track{grid-area:track;height:8px}
+
+  /* Stock por categoría: lista compacta, permite envolver sin cortar */
+  .cat-row{padding:9px 0;gap:10px}
+  .cat-name{font-size:.84rem}
+  .cat-meta{font-size:.68rem}
+  .cat-val {font-size:.95rem}
+
+  /* Histórico mínimos anuales: ya es lista compacta; aseguramos ajuste */
+  .bien-item-row{font-size:.74rem}
+  .bien-item-name{flex:1 1 auto}
+
+  /* Distribución por categoría (torta): centrar y poner leyenda debajo */
+  .pie-body{flex-direction:column;align-items:center;gap:14px}
+  .pie-media{display:flex;justify-content:center;width:100%}
+  .pie-media svg{width:min(58vw,200px);height:auto}
+  .pie-legend{width:100%;min-width:0}
+}
+
+/* En pantallas muy chicas, la share-bar de categorías gana protagonismo */
+.cat-share{height:6px;border-radius:5px;background:var(--surface3);overflow:hidden;margin-top:6px;max-width:340px}
+.cat-share > i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,#0D63EA,#5aa0ff);transition:width .6s cubic-bezier(.22,1,.36,1)}
+

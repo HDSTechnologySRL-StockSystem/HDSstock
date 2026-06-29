@@ -1,0 +1,37 @@
+<div id="reset-overlay" onclick="if(event.target===this)closeResetOverlay()">
+  <div class="reset-card">
+    <div class="login-brand">H</div>
+    <div class="login-title" id="reset-title">Recuperar contraseña</div>
+    <div class="login-hint" id="reset-hint">Ingresá tu usuario y te enviamos un código al mail registrado.</div>
+    <div class="login-fields reset-step" id="reset-step1">
+      <div class="login-input-wrap">
+        <input class="login-input" id="rs-usr" type="text" placeholder="Usuario" autocomplete="off" maxlength="30"/>
+      </div>
+      <div class="login-err" id="rs-err1"></div>
+      <button class="login-btn primary" onclick="resetStep1Submit()">Enviar código</button>
+      <button class="login-btn" onclick="closeResetOverlay()">Cancelar</button>
+    </div>
+    <div class="login-fields reset-step hidden" id="reset-step2">
+      <div class="login-input-wrap">
+        <input class="login-input reset-code-input" id="rs-code" type="text" placeholder="000000" maxlength="6" autocomplete="off"/>
+      </div>
+      <div class="login-err" id="rs-err2"></div>
+      <button class="login-btn primary" onclick="resetStep2Submit()">Verificar código</button>
+      <button class="login-link" onclick="resetStep1Retry()">Reenviar código</button>
+      <button class="login-btn" onclick="closeResetOverlay()">Cancelar</button>
+    </div>
+    <div class="login-fields reset-step hidden" id="reset-step3">
+      <div class="login-input-wrap">
+        <input class="login-input" id="rs-newpass" type="password" placeholder="Nueva contraseña" maxlength="30"/>
+      </div>
+      <div class="login-input-wrap">
+        <input class="login-input" id="rs-newpass2" type="password" placeholder="Repetir contraseña" maxlength="30"/>
+      </div>
+      <div class="login-err" id="rs-err3"></div>
+      <button class="login-btn primary" onclick="resetStep3Submit()">Cambiar contraseña</button>
+      <button class="login-btn" onclick="closeResetOverlay()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+

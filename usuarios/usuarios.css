@@ -1,0 +1,80 @@
+/* ════════ PANEL DE GESTIÓN DE USUARIOS ════════ */
+.usr-main{flex:1;overflow-y:auto;padding:14px 16px}
+.usr-section-title{font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin:4px 0 10px}
+.usr-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow-sm)}
+.usr-card.pending{border-color:var(--amber);background:var(--amber-dim)}
+.usr-card-info{display:flex;align-items:center;gap:12px}
+.usr-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+.usr-av{width:36px;height:36px;border-radius:11px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex-shrink:0;overflow:hidden}
+.usr-av.admin{background:linear-gradient(135deg,#F59E0B,#D97706)}
+.usr-name{font-weight:700;font-size:14px;color:var(--ink);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.usr-badge-admin{font-size:9px;font-weight:700;letter-spacing:.5px;padding:2px 8px;background:linear-gradient(135deg,#F59E0B,#D97706);color:#fff;border-radius:20px;text-transform:uppercase}
+.usr-meta{font-size:11px;color:var(--muted);margin-top:1px}
+.usr-actions{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.usr-btn{font-family:inherit;font-size:11px;font-weight:700;letter-spacing:.4px;padding:7px 14px;border-radius:10px;cursor:pointer;border:none;transition:filter .12s;white-space:nowrap}
+.usr-btn.approve{background:var(--green);color:#fff}
+.usr-btn.reject{background:var(--red);color:#fff}
+.usr-btn.delete{background:transparent;color:var(--red);border:1px solid var(--red);padding:6px 10px;font-size:11px}
+.usr-btn.delete:hover{background:var(--red);color:#fff}
+.usr-btn:hover{filter:brightness(.88)}
+/* ── Presets rápidos ── */
+.usr-preset-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 12px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);margin-bottom:10px}
+.usr-preset-lbl{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.usr-preset-btn{font-family:inherit;font-size:11px;font-weight:700;padding:5px 13px;border-radius:8px;border:1px solid var(--border2);background:var(--surface);color:var(--text);cursor:pointer;transition:all .12s;white-space:nowrap}
+.usr-preset-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--blue-dim)}
+.usr-preset-btn.danger{color:var(--red);border-color:rgba(229,72,77,.3);background:var(--red-dim)}
+.usr-preset-btn.danger:hover{background:var(--red);color:#fff;border-color:var(--red)}
+/* ── Grupos de permisos ── */
+.usr-perm-groups{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.usr-perm-group{border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.usr-perm-group-head{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--surface2);font-size:11px;font-weight:700;letter-spacing:.3px;color:var(--text);user-select:none;transition:background .12s}
+.usr-perm-group-head:hover{background:var(--surface3)}
+.usr-perm-group-head.collapsed{background:var(--surface)}
+.usr-perm-count{font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;background:var(--blue-dim);color:var(--accent)}
+.usr-perm-toggle-all{display:flex;align-items:center;gap:5px;cursor:pointer;padding:4px 8px;border-radius:7px;border:1px solid var(--border2);background:var(--surface);transition:all .12s}
+.usr-perm-toggle-all:hover{border-color:var(--accent);background:var(--blue-dim)}
+.usr-perm-toggle-all input{width:13px;height:13px;accent-color:var(--accent);cursor:pointer}
+/* ── Fila de permisos individuales ── */
+.usr-perm-row{display:flex;flex-wrap:wrap;gap:5px;padding:10px 12px;background:var(--surface)}
+.usr-perm-toggle{display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;padding:5px 10px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);transition:all .12s}
+.usr-perm-toggle:hover:not(.disabled){border-color:var(--accent);background:var(--blue-dim)}
+.usr-perm-toggle:has(input:checked){border-color:rgba(13,99,234,.4);background:var(--blue-dim)}
+.usr-perm-toggle.disabled{opacity:.45;cursor:not-allowed;pointer-events:none}
+.usr-perm-toggle input[type=checkbox]{width:13px;height:13px;accent-color:var(--accent);cursor:inherit;flex-shrink:0}
+.usr-perm-label{font-size:11px;font-weight:500;color:var(--text);white-space:nowrap}
+.usr-rol-select{font-family:inherit;font-size:12px;font-weight:600;padding:6px 10px;border:1px solid var(--border2);border-radius:9px;background:var(--surface2);color:var(--text);outline:none;cursor:pointer}
+.usr-rol-select:focus{border-color:var(--accent)}
+.usr-empty{font-size:13px;color:var(--muted);text-align:center;padding:16px 0}
+.nb-users{display:none}
+/* ── Responsive permisos ── */
+@media (max-width:640px){
+  .usr-perm-row{gap:5px 8px}
+  .usr-perm-toggle{padding:4px 8px}
+  .usr-perm-label{font-size:10px}
+  .usr-preset-bar{gap:6px}
+  .usr-preset-btn{font-size:10px;padding:4px 10px}
+}
+/* ════════ VERIFICACIÓN DE EMAIL ════════ */
+#li-verify-wrap{width:100%;display:flex;flex-direction:column;gap:8px}
+/* ════════ CUENTA PENDIENTE ════════ */
+#pending-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:9999;align-items:center;justify-content:center;padding:24px}
+.pending-card{background:var(--surface);border:1px solid var(--border);border-radius:22px;padding:32px 28px;max-width:380px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.pending-icon{font-size:48px;margin-bottom:14px;line-height:1}
+.pending-title{font-family:var(--font-display);font-size:17px;font-weight:800;color:var(--ink);margin-bottom:10px}
+.pending-body{font-size:13px;color:var(--text);line-height:1.55}
+.pending-hint{font-size:11px;color:var(--muted);margin-top:12px;padding:8px 12px;background:var(--surface2);border-radius:9px}
+/* ════════ RECUPERAR CONTRASEÑA ════════ */
+.login-link{margin-top:6px;background:none;border:none;color:var(--muted);font-family:var(--font-ui);font-size:12px;cursor:pointer;padding:4px 0;text-decoration:underline;text-underline-offset:3px;transition:color .15s}
+.login-link:hover{color:var(--accent)}
+#reset-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:9999;align-items:center;justify-content:center;padding:24px}
+.reset-card{background:var(--surface);border:1px solid var(--border);border-radius:22px;padding:32px 28px;max-width:360px;width:100%;display:flex;flex-direction:column;align-items:center;gap:0;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.reset-card .login-title{margin-bottom:6px}
+.reset-card .login-hint{margin-bottom:18px;text-align:center}
+.reset-card .login-fields{width:100%}
+.reset-step{width:100%;display:flex;flex-direction:column;gap:0}
+.reset-step.hidden{display:none}
+.reset-code-input{letter-spacing:8px;text-align:center;font-size:24px;font-weight:700}
+
+
+/* ── iPhone safe area (notch / home bar) ──────── */
+@supports (padding-bottom: env(safe-area-inset-bottom)){
